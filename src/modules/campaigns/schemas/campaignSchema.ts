@@ -1,7 +1,12 @@
 import { z } from "zod";
 import { required, optional, buildIssue } from "@shared/schemas/common";
 
-export const campaignSchema = (t: (key: string, options?: any) => string) =>
+const schemaCache = new WeakMap<
+  Function,
+  ReturnType<typeof createCampaignSchema>
+>();
+
+const createCampaignSchema = (t: (key: string, options?: any) => string) =>
   z
     .object({
       title: required(t, "fields.title", "string"),
@@ -34,4 +39,11 @@ export const campaignSchema = (t: (key: string, options?: any) => string) =>
       }
     });
 
+export const campaignSchema = (t: (key: string, options?: any) => string) => {
+  if (!schemaCache.has(t)) {
+    schemaCache.set(t, createCampaignSchema(t));
+  }
+
+  return schemaCache.get(t)!;
+};
 export type CampaignFormData = z.infer<ReturnType<typeof campaignSchema>>;

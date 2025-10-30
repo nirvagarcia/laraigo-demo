@@ -1,6 +1,3 @@
-import { UseFormReturn } from "react-hook-form";
-import { CampaignFormData } from "../schemas/campaignSchema";
-
 export const formatTimeForInput = (date?: Date): string => {
   if (!date) return "";
   return date.toTimeString().slice(0, 5);
@@ -11,25 +8,6 @@ export const parseTimeFromInput = (timeString: string): Date => {
   const date = new Date();
   date.setHours(hours, minutes, 0, 0);
   return date;
-};
-
-export const getFormDefaultValues = (): Partial<CampaignFormData> => ({
-  title: "",
-  description: "",
-  startDate: undefined,
-  endDate: undefined,
-  source: "",
-  executionType: "",
-  scheduledDate: undefined,
-  scheduledTime: "",
-  group: "",
-  channel: "",
-  messageType: "",
-  template: "",
-});
-
-export const resetFormToDefaults = (form: UseFormReturn<CampaignFormData>) => {
-  form.reset(getFormDefaultValues());
 };
 
 export const isScheduledExecution = (executionType: string): boolean => {

@@ -1,11 +1,31 @@
 import { CampaignFormData } from "../schemas/campaignSchema";
 import { Campaign } from "../types/campaign";
+import { defaultCampaignValues } from "../utils/formDefaults";
 
 export interface CampaignService {
   save: (data: CampaignFormData, id?: string) => Promise<Campaign>;
   create: (data: CampaignFormData) => Promise<Campaign>;
   update: (id: string, data: CampaignFormData) => Promise<Campaign>;
 }
+
+const mapFormDataToCampaign = (
+  data: CampaignFormData
+): Omit<Campaign, "id" | "createdAt" | "updatedAt"> => ({
+  ...defaultCampaignValues,
+  title: data.title || defaultCampaignValues.title,
+  description: data.description || defaultCampaignValues.description,
+  startDate: data.startDate || new Date(),
+  endDate: data.endDate || new Date(),
+  source: data.source || defaultCampaignValues.source,
+  executionType: data.executionType || defaultCampaignValues.executionType,
+  scheduledDate: data.scheduledDate || defaultCampaignValues.scheduledDate,
+  scheduledTime: data.scheduledTime || defaultCampaignValues.scheduledTime,
+  group: data.group || defaultCampaignValues.group,
+  channel: data.channel || defaultCampaignValues.channel,
+  messageType: data.messageType || defaultCampaignValues.messageType,
+  template: data.template || defaultCampaignValues.template,
+  status: "draft" as const,
+});
 
 class MockCampaignService implements CampaignService {
   async save(data: CampaignFormData, id?: string): Promise<Campaign> {
@@ -20,20 +40,8 @@ class MockCampaignService implements CampaignService {
 
   async create(data: CampaignFormData): Promise<Campaign> {
     const newCampaign: Campaign = {
+      ...mapFormDataToCampaign(data),
       id: Date.now().toString(),
-      title: data.title || "",
-      description: data.description || "",
-      startDate: data.startDate || new Date(),
-      endDate: data.endDate || new Date(),
-      source: data.source || "",
-      executionType: data.executionType || "",
-      scheduledDate: data.scheduledDate || undefined,
-      scheduledTime: data.scheduledTime || undefined,
-      group: data.group || "",
-      channel: data.channel || "",
-      messageType: data.messageType || "",
-      template: data.template || "",
-      status: "draft",
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -43,20 +51,8 @@ class MockCampaignService implements CampaignService {
 
   async update(id: string, data: CampaignFormData): Promise<Campaign> {
     const updatedCampaign: Campaign = {
+      ...mapFormDataToCampaign(data),
       id,
-      title: data.title || "",
-      description: data.description || "",
-      startDate: data.startDate || new Date(),
-      endDate: data.endDate || new Date(),
-      source: data.source || "",
-      executionType: data.executionType || "",
-      scheduledDate: data.scheduledDate || undefined,
-      scheduledTime: data.scheduledTime || undefined,
-      group: data.group || "",
-      channel: data.channel || "",
-      messageType: data.messageType || "",
-      template: data.template || "",
-      status: "draft",
       createdAt: new Date(Date.now() - 86400000),
       updatedAt: new Date(),
     };

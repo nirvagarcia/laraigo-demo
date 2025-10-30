@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, memo } from "react";
 import { Grid, TextField, MenuItem, Box } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
@@ -17,7 +17,7 @@ import {
 } from "../data/mockData";
 import { isScheduledExecution } from "../utils/formHelpers";
 
-export const GeneralTab: React.FC = () => {
+export const GeneralTab = memo(() => {
   const { t } = useTranslation();
   const {
     register,
@@ -29,24 +29,72 @@ export const GeneralTab: React.FC = () => {
 
   const executionType = watch("executionType");
   const messageType = watch("messageType");
-  const isScheduled = isScheduledExecution(executionType);
+  const isScheduled = useMemo(
+    () => isScheduledExecution(executionType),
+    [executionType]
+  );
 
   const getErrorMessage = (error: any): string => {
     return typeof error?.message === "string" ? error.message : "";
   };
 
-  const getTranslatedOptions = (
-    options: Array<{ value: string; label: string }>
-  ) => {
-    return options.map((option) => ({
-      ...option,
-      displayLabel: t(option.label),
-    }));
-  };
+  const translatedSourceOptions = useMemo(
+    () =>
+      sourceOptions.map((option) => ({
+        ...option,
+        displayLabel: t(option.label),
+      })),
+    [t]
+  );
 
-  const availableTemplates = messageType
-    ? templateOptions[messageType] || []
-    : [];
+  const translatedExecutionTypeOptions = useMemo(
+    () =>
+      executionTypeOptions.map((option) => ({
+        ...option,
+        displayLabel: t(option.label),
+      })),
+    [t]
+  );
+
+  const translatedGroupOptions = useMemo(
+    () =>
+      groupOptions.map((option) => ({
+        ...option,
+        displayLabel: t(option.label),
+      })),
+    [t]
+  );
+
+  const translatedChannelOptions = useMemo(
+    () =>
+      channelOptions.map((option) => ({
+        ...option,
+        displayLabel: t(option.label),
+      })),
+    [t]
+  );
+
+  const translatedMessageTypeOptions = useMemo(
+    () =>
+      messageTypeOptions.map((option) => ({
+        ...option,
+        displayLabel: t(option.label),
+      })),
+    [t]
+  );
+
+  const availableTemplates = useMemo(() => {
+    return messageType ? templateOptions[messageType] || [] : [];
+  }, [messageType]);
+
+  const translatedTemplateOptions = useMemo(
+    () =>
+      availableTemplates.map((option) => ({
+        ...option,
+        displayLabel: t(option.label),
+      })),
+    [availableTemplates, t]
+  );
 
   useEffect(() => {
     if (
@@ -144,7 +192,7 @@ export const GeneralTab: React.FC = () => {
                   error={!!errors.source}
                   helperText={getErrorMessage(errors.source)}
                 >
-                  {getTranslatedOptions(sourceOptions).map((option) => (
+                  {translatedSourceOptions.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.displayLabel}
                     </MenuItem>
@@ -169,7 +217,7 @@ export const GeneralTab: React.FC = () => {
                   error={!!errors.executionType}
                   helperText={getErrorMessage(errors.executionType)}
                 >
-                  {getTranslatedOptions(executionTypeOptions).map((option) => (
+                  {translatedExecutionTypeOptions.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.displayLabel}
                     </MenuItem>
@@ -253,7 +301,7 @@ export const GeneralTab: React.FC = () => {
                   error={!!errors.group}
                   helperText={getErrorMessage(errors.group)}
                 >
-                  {getTranslatedOptions(groupOptions).map((option) => (
+                  {translatedGroupOptions.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.displayLabel}
                     </MenuItem>
@@ -278,7 +326,7 @@ export const GeneralTab: React.FC = () => {
                   error={!!errors.channel}
                   helperText={getErrorMessage(errors.channel)}
                 >
-                  {getTranslatedOptions(channelOptions).map((option) => (
+                  {translatedChannelOptions.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.displayLabel}
                     </MenuItem>
@@ -303,7 +351,7 @@ export const GeneralTab: React.FC = () => {
                   error={!!errors.messageType}
                   helperText={getErrorMessage(errors.messageType)}
                 >
-                  {getTranslatedOptions(messageTypeOptions).map((option) => (
+                  {translatedMessageTypeOptions.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.displayLabel}
                     </MenuItem>
@@ -329,9 +377,9 @@ export const GeneralTab: React.FC = () => {
                   helperText={getErrorMessage(errors.template)}
                   disabled={!messageType || availableTemplates.length === 0}
                 >
-                  {availableTemplates.map((template) => (
+                  {translatedTemplateOptions.map((template) => (
                     <MenuItem key={template.value} value={template.value}>
-                      {template.label}
+                      {template.displayLabel}
                     </MenuItem>
                   ))}
                 </TextField>
@@ -342,6 +390,6 @@ export const GeneralTab: React.FC = () => {
       </Box>
     </LocalizationProvider>
   );
-};
+});
 
 export default GeneralTab;

@@ -1,4 +1,10 @@
-import { createContext, useContext, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useMemo,
+  useCallback,
+} from "react";
 import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "@app/providers/I18nProvider";
@@ -22,19 +28,29 @@ export const CampaignProvider: React.FC<CampaignProviderProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const methods = useForm<CampaignFormData>({
-    resolver: zodResolver(campaignSchema(t)),
-    defaultValues: {
+  const resolver = useMemo(() => zodResolver(campaignSchema(t)), [t]);
+
+  const defaultValues = useMemo(
+    () => ({
       ...getDefaultCampaignValues(),
       ...initialValues,
-    },
-    mode: "onBlur",
+    }),
+    [initialValues]
+  );
+
+  const methods = useForm<CampaignFormData>({
+    resolver,
+    defaultValues,
+    mode: "all",
     reValidateMode: "onChange",
   });
 
-  const updateField = (field: keyof CampaignFormData, value: any) => {
-    methods.setValue(field, value, { shouldValidate: true });
-  };
+  const updateField = useCallback(
+    (field: keyof CampaignFormData, value: any) => {
+      methods.setValue(field, value, { shouldValidate: true });
+    },
+    [methods.setValue]
+  );
 
   const contextValue: CampaignContextType = {
     ...methods,

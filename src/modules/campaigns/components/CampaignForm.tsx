@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, memo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Box, Typography, Tabs, Tab, Stack, Card } from "@mui/material";
 import { Button } from "@shared/components/ui/Button";
@@ -23,7 +23,7 @@ interface TabPanelProps {
   value: number;
 }
 
-const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
+const TabPanel = memo<TabPanelProps>(({ children, value, index }) => {
   return (
     <div
       role="tabpanel"
@@ -34,7 +34,7 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
       {value === index && <Box>{children}</Box>}
     </div>
   );
-};
+});
 
 const CampaignFormInner: React.FC = () => {
   const { t } = useTranslation();
@@ -50,33 +50,39 @@ const CampaignFormInner: React.FC = () => {
   const isEditing = id && id !== "new";
   const pageTitle = isEditing ? t("campaign.edit") : t("campaign.create");
 
-  const onSubmit = async (data: CampaignFormData) => {
-    try {
-      await campaignService.save(data, isEditing ? id : undefined);
-      toast.success(
-        isEditing
-          ? t("messages.campaign_updated")
-          : t("messages.campaign_created")
-      );
-      goToCampaignsList(navigate);
-    } catch (error) {
-      console.error("Error saving campaign:", error);
+  const onSubmit = useCallback(
+    async (data: CampaignFormData) => {
+      try {
+        await campaignService.save(data, isEditing ? id : undefined);
+        toast.success(
+          isEditing
+            ? t("messages.campaign_updated")
+            : t("messages.campaign_created")
+        );
+        goToCampaignsList(navigate);
+      } catch (error) {
+        console.error("Error saving campaign:", error);
 
-      if (error instanceof CampaignError) {
-        toast.error(error.message);
-      } else {
-        toast.error(t("errors.save_failed"));
+        if (error instanceof CampaignError) {
+          toast.error(error.message);
+        } else {
+          toast.error(t("errors.save_failed"));
+        }
       }
-    }
-  };
+    },
+    [id, isEditing, navigate, t]
+  );
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     goToCampaignsList(navigate);
-  };
+  }, [navigate]);
 
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
-  };
+  const handleTabChange = useCallback(
+    (_event: React.SyntheticEvent, newValue: number) => {
+      setActiveTab(newValue);
+    },
+    []
+  );
 
   return (
     <PageContainer>

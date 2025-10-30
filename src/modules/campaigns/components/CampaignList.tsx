@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, Stack, IconButton } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
@@ -7,8 +7,7 @@ import { Button } from "@shared/components/ui/Button";
 import { Chip } from "@shared/components/ui/Chip";
 import { PageContainer } from "@shared/components/layout/PageContainer";
 import { useTranslation } from "@app/providers/I18nProvider";
-import { Campaign } from "../types/campaign";
-import { mockCampaigns } from "../data/mocks/campaigns.mock";
+import { useCampaigns, useCampaignStatus } from "../hooks";
 import { goToNewCampaign, goToEditCampaign } from "../utils/navigation";
 import {
   CampaignContainer,
@@ -20,45 +19,26 @@ import {
 export const CampaignList: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { campaigns, deleteCampaign } = useCampaigns();
+  const { getStatusColor, getStatusLabel } = useCampaignStatus();
 
-  const [campaigns, setCampaigns] = useState<Campaign[]>(
-    mockCampaigns.map((campaign) => ({
-      ...campaign,
-      title: t(campaign.title),
-      description: t(campaign.description),
-    }))
+  const handleCreateCampaign = useCallback(() => {
+    goToNewCampaign(navigate);
+  }, [navigate]);
+
+  const handleEditCampaign = useCallback(
+    (id: string) => {
+      goToEditCampaign(navigate, id);
+    },
+    [navigate]
   );
 
-  const handleCreateCampaign = () => {
-    goToNewCampaign(navigate);
-  };
-
-  const handleEditCampaign = (id: string) => {
-    goToEditCampaign(navigate, id);
-  };
-
-  const handleDeleteCampaign = (id: string) => {
-    setCampaigns((prev) => prev.filter((campaign) => campaign.id !== id));
-  };
-
-  const getStatusColor = (status: Campaign["status"]) => {
-    switch (status) {
-      case "active":
-        return "success";
-      case "draft":
-        return "warning";
-      case "paused":
-        return "info";
-      case "completed":
-        return "secondary";
-      default:
-        return "default";
-    }
-  };
-
-  const getStatusLabel = (status: Campaign["status"]) => {
-    return t(`status.${status}`);
-  };
+  const handleDeleteCampaign = useCallback(
+    (id: string) => {
+      deleteCampaign(id);
+    },
+    [deleteCampaign]
+  );
 
   return (
     <PageContainer>

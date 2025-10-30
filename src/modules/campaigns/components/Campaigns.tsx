@@ -23,6 +23,7 @@ import { campaignSchema, CampaignFormData } from "../schemas/campaignSchema";
 import { Campaign } from "../types/campaign";
 import { mockCampaigns } from "../data/mocks/campaigns.mock";
 import { sourceOptions, executionTypeOptions } from "../data/mockData";
+import { defaultCampaignValues } from "../utils/formDefaults";
 import {
   CampaignContainer,
   CampaignHeader,
@@ -51,20 +52,7 @@ export const Campaigns: React.FC = () => {
 
   const form = useForm<CampaignFormData>({
     resolver: zodResolver(campaignSchema(t)),
-    defaultValues: {
-      title: "",
-      description: "",
-      startDate: undefined,
-      endDate: undefined,
-      source: "",
-      executionType: "",
-      scheduledDate: undefined,
-      scheduledTime: "",
-      group: "",
-      channel: "",
-      messageType: "",
-      template: "",
-    },
+    defaultValues: defaultCampaignValues,
     mode: "onBlur",
     reValidateMode: "onChange",
   });
@@ -339,7 +327,7 @@ export const Campaigns: React.FC = () => {
                           onClick={() =>
                             window.open("/campaigns/new", "_blank")
                           }
-                          sx={{ textDecoration: "underline", p: 0 }}
+                          sx={campaignSx.underlinedButton}
                         >
                           {t("tips.full_form_link")}
                         </Button>
