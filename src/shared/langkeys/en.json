@@ -91,5 +91,10 @@
   "persons.feature.exclusion": "Exclusion of specific groups",
   "persons.feature.validation": "Contact validation",
   "tips.advanced_config": "💡 <strong>Tip:</strong> For advanced configuration including groups, channels, message types and templates, use the",
-  "tips.full_form_link": "full campaign form"
+  "tips.full_form_link": "full campaign form",
+  "common.coming_soon": "Coming Soon",
+  "common.coming_soon_description": "We are working on this section. Come back soon to see what's new.",
+  "common.back_to_home": "Back to Home",
+  "campaign.loading": "Loading campaigns...",
+  "campaign.error": "Error loading campaigns"
 }

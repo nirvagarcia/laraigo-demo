@@ -3,6 +3,7 @@ import { MainLayout } from "@app/layouts/MainLayout";
 import { Laraigo } from "@modules/home/components/Laraigo";
 import { CampaignList } from "@modules/campaigns/components/CampaignList";
 import { CampaignForm } from "@modules/campaigns/components/CampaignForm";
+import ComingSoon from "@modules/common/pages/ComingSoon";
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -33,6 +34,33 @@ export const AppRoutes: React.FC = () => {
           element={
             <MainLayout>
               <CampaignForm />
+            </MainLayout>
+          }
+        />
+
+        <Route
+          path="/templates"
+          element={
+            <MainLayout>
+              <ComingSoon titleKey="menu.templates" />
+            </MainLayout>
+          }
+        />
+
+        <Route
+          path="/dashboard"
+          element={
+            <MainLayout>
+              <ComingSoon titleKey="menu.dashboard" />
+            </MainLayout>
+          }
+        />
+
+        <Route
+          path="/reports"
+          element={
+            <MainLayout>
+              <ComingSoon titleKey="menu.reports" />
             </MainLayout>
           }
         />
