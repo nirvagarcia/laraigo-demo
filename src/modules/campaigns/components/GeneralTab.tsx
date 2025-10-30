@@ -1,4 +1,4 @@
-import { useEffect, useMemo, memo } from "react";
+import { useEffect, useMemo, memo, useState } from "react";
 import { Grid, TextField, MenuItem, Box } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
@@ -7,14 +7,8 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { Controller } from "react-hook-form";
 import { useTranslation } from "@app/providers/I18nProvider";
 import { useCampaign } from "../contexts/CampaignContext";
-import {
-  sourceOptions,
-  executionTypeOptions,
-  groupOptions,
-  channelOptions,
-  messageTypeOptions,
-  templateOptions,
-} from "../data/mockData";
+import { SelectOption } from "../types/selectOption";
+import { optionsService } from "../data/optionsService";
 import { isScheduledExecution } from "../utils/formHelpers";
 
 export const GeneralTab = memo(() => {
@@ -27,6 +21,15 @@ export const GeneralTab = memo(() => {
     formState: { errors },
   } = useCampaign();
 
+  const [sources, setSources] = useState<SelectOption[]>([]);
+  const [executionTypes, setExecutionTypes] = useState<SelectOption[]>([]);
+  const [groups, setGroups] = useState<SelectOption[]>([]);
+  const [channels, setChannels] = useState<SelectOption[]>([]);
+  const [messageTypes, setMessageTypes] = useState<SelectOption[]>([]);
+  const [templates, setTemplates] = useState<Record<string, SelectOption[]>>(
+    {}
+  );
+
   const executionType = watch("executionType");
   const messageType = watch("messageType");
   const isScheduled = useMemo(
@@ -38,54 +41,66 @@ export const GeneralTab = memo(() => {
     return typeof error?.message === "string" ? error.message : "";
   };
 
+  useEffect(() => {
+    optionsService.getSources().then(setSources).catch(console.error);
+    optionsService
+      .getExecutionTypes()
+      .then(setExecutionTypes)
+      .catch(console.error);
+    optionsService.getGroups().then(setGroups).catch(console.error);
+    optionsService.getChannels().then(setChannels).catch(console.error);
+    optionsService.getMessageTypes().then(setMessageTypes).catch(console.error);
+    optionsService.getTemplates().then(setTemplates).catch(console.error);
+  }, []);
+
   const translatedSourceOptions = useMemo(
     () =>
-      sourceOptions.map((option) => ({
+      sources.map((option) => ({
         ...option,
         displayLabel: t(option.label),
       })),
-    [t]
+    [sources, t]
   );
 
   const translatedExecutionTypeOptions = useMemo(
     () =>
-      executionTypeOptions.map((option) => ({
+      executionTypes.map((option) => ({
         ...option,
         displayLabel: t(option.label),
       })),
-    [t]
+    [executionTypes, t]
   );
 
   const translatedGroupOptions = useMemo(
     () =>
-      groupOptions.map((option) => ({
+      groups.map((option) => ({
         ...option,
         displayLabel: t(option.label),
       })),
-    [t]
+    [groups, t]
   );
 
   const translatedChannelOptions = useMemo(
     () =>
-      channelOptions.map((option) => ({
+      channels.map((option) => ({
         ...option,
         displayLabel: t(option.label),
       })),
-    [t]
+    [channels, t]
   );
 
   const translatedMessageTypeOptions = useMemo(
     () =>
-      messageTypeOptions.map((option) => ({
+      messageTypes.map((option) => ({
         ...option,
         displayLabel: t(option.label),
       })),
-    [t]
+    [messageTypes, t]
   );
 
   const availableTemplates = useMemo(() => {
-    return messageType ? templateOptions[messageType] || [] : [];
-  }, [messageType]);
+    return messageType ? templates[messageType] || [] : [];
+  }, [messageType, templates]);
 
   const translatedTemplateOptions = useMemo(
     () =>

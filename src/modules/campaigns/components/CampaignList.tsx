@@ -19,7 +19,7 @@ import {
 export const CampaignList: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { campaigns, deleteCampaign } = useCampaigns();
+  const { campaigns, isLoading, error, deleteCampaign } = useCampaigns();
   const { getStatusColor, getStatusLabel } = useCampaignStatus();
 
   const handleCreateCampaign = useCallback(() => {
@@ -34,11 +34,62 @@ export const CampaignList: React.FC = () => {
   );
 
   const handleDeleteCampaign = useCallback(
-    (id: string) => {
-      deleteCampaign(id);
+    async (id: string) => {
+      try {
+        await deleteCampaign(id);
+      } catch (error) {
+        console.error("Failed to delete campaign:", error);
+      }
     },
     [deleteCampaign]
   );
+
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <CampaignContainer>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "400px",
+            }}
+          >
+            <Typography variant="h6" color="text.secondary">
+              {t("campaign.loading")}
+            </Typography>
+          </Box>
+        </CampaignContainer>
+      </PageContainer>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <PageContainer>
+        <CampaignContainer>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              minHeight: "400px",
+              justifyContent: "center",
+            }}
+          >
+            <Typography variant="h6" color="error" gutterBottom>
+              {t("campaign.error")}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {error}
+            </Typography>
+          </Box>
+        </CampaignContainer>
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>

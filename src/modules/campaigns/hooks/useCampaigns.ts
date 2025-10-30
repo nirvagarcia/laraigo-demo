@@ -1,26 +1,47 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useTranslation } from "@app/providers/I18nProvider";
 import { Campaign } from "../types/campaign";
-import { mockCampaigns } from "../data/mocks/campaigns.mock";
+import { campaignApiService } from "../data/campaignApiService";
 import { campaignService } from "../services/campaignService";
 import { CampaignFormData } from "../schemas/campaignSchema";
 
 export const useCampaigns = () => {
   const { t } = useTranslation();
 
-  const initialCampaigns = useMemo(
-    () =>
-      mockCampaigns.map((campaign) => ({
-        ...campaign,
-        title: t(campaign.title),
-        description: t(campaign.description),
-      })),
-    [t]
-  );
-
-  const [campaigns, setCampaigns] = useState<Campaign[]>(initialCampaigns);
-  const [isLoading, setIsLoading] = useState(false);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadCampaigns = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const apiCampaigns = await campaignApiService.getAll();
+
+        const translatedCampaigns = apiCampaigns.map((campaign) => ({
+          ...campaign,
+          title: campaign.title.startsWith("sample.")
+            ? t(campaign.title)
+            : campaign.title,
+          description: campaign.description.startsWith("sample.")
+            ? t(campaign.description)
+            : campaign.description,
+        }));
+
+        setCampaigns(translatedCampaigns);
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to load campaigns";
+        setError(errorMessage);
+        console.error("Error loading campaigns:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadCampaigns();
+  }, [t]);
 
   const createCampaign = useCallback(
     async (data: CampaignFormData): Promise<Campaign> => {
@@ -28,7 +49,9 @@ export const useCampaigns = () => {
       setError(null);
 
       try {
-        const newCampaign = await campaignService.create(data);
+        const formCampaign = await campaignService.create(data);
+        const newCampaign = await campaignApiService.create(formCampaign);
+
         setCampaigns((prev) => [...prev, newCampaign]);
         return newCampaign;
       } catch (err) {
@@ -49,7 +72,12 @@ export const useCampaigns = () => {
       setError(null);
 
       try {
-        const updatedCampaign = await campaignService.update(id, data);
+        const formCampaign = await campaignService.update(id, data);
+        const updatedCampaign = await campaignApiService.update(
+          id,
+          formCampaign
+        );
+
         setCampaigns((prev) =>
           prev.map((campaign) =>
             campaign.id === id ? updatedCampaign : campaign
@@ -68,8 +96,30 @@ export const useCampaigns = () => {
     []
   );
 
-  const deleteCampaign = useCallback((id: string) => {
-    setCampaigns((prev) => prev.filter((campaign) => campaign.id !== id));
+  const deleteCampaign = useCallback(async (id: string): Promise<void> => {
+    setError(null);
+
+    try {
+      setCampaigns((prev) => prev.filter((campaign) => campaign.id !== id));
+
+      await campaignApiService.remove(id);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to delete campaign";
+      setError(errorMessage);
+
+      try {
+        const apiCampaigns = await campaignApiService.getAll();
+        setCampaigns(apiCampaigns);
+      } catch (refetchErr) {
+        console.error(
+          "Failed to restore campaigns after delete error:",
+          refetchErr
+        );
+      }
+
+      throw err;
+    }
   }, []);
 
   const saveCampaign = useCallback(
@@ -87,6 +137,20 @@ export const useCampaigns = () => {
     updateCampaign,
     deleteCampaign,
     saveCampaign,
+    refresh: useCallback(async () => {
+      try {
+        setIsLoading(true);
+        const apiCampaigns = await campaignApiService.getAll();
+        setCampaigns(apiCampaigns);
+        setError(null);
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to refresh campaigns";
+        setError(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
+    }, []),
   };
 };
 

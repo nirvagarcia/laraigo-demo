@@ -4,6 +4,8 @@ export const API_CONFIG = {
   RETRY_ATTEMPTS: 3,
 } as const;
 
+export const API_BASE_URL = "http://localhost:4000";
+
 export const API_ENDPOINTS = {
   CAMPAIGNS: "/campaigns",
   TEMPLATES: "/templates",

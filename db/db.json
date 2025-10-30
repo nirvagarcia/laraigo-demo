@@ -1,0 +1,108 @@
+{
+  "campaigns": [
+    {
+      "id": "1",
+      "title": "Summer Campaign 2025",
+      "description": "Promotional campaign for summer products and services",
+      "startDate": "2025-06-01T00:00:00.000Z",
+      "endDate": "2025-08-31T00:00:00.000Z",
+      "source": "externa",
+      "executionType": "manual",
+      "group": "claro",
+      "channel": "whatsapp",
+      "messageType": "hsm",
+      "template": "hsm_template_1",
+      "status": "active",
+      "createdAt": "2025-10-01T10:00:00.000Z",
+      "updatedAt": "2025-10-01T10:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "title": "Black Friday Campaign",
+      "description": "Special promotions and discounts for Black Friday shopping event",
+      "startDate": "2025-11-24T00:00:00.000Z",
+      "endDate": "2025-11-30T00:00:00.000Z",
+      "source": "personas",
+      "executionType": "programada",
+      "scheduledDate": "2025-11-24T09:00:00.000Z",
+      "scheduledTime": "09:00",
+      "group": "entel",
+      "channel": "correo",
+      "messageType": "mail",
+      "template": "mail_template_2",
+      "status": "draft",
+      "createdAt": "2025-10-15T14:30:00.000Z",
+      "updatedAt": "2025-10-15T14:30:00.000Z"
+    },
+    {
+      "id": "3",
+      "title": "Holiday Greetings",
+      "description": "Seasonal holiday wishes and special offers for customers",
+      "startDate": "2025-12-15T00:00:00.000Z",
+      "endDate": "2026-01-05T00:00:00.000Z",
+      "source": "externa",
+      "executionType": "manual",
+      "group": "claro",
+      "channel": "whatsapp",
+      "messageType": "hsm",
+      "template": "hsm_template_2",
+      "status": "paused",
+      "createdAt": "2025-10-20T09:15:00.000Z",
+      "updatedAt": "2025-10-25T16:45:00.000Z"
+    }
+  ],
+  "sources": [
+    { "value": "externa", "label": "source.externa" },
+    { "value": "personas", "label": "source.personas" },
+    { "value": "oportunidades", "label": "source.oportunidades" }
+  ],
+  "executionTypes": [
+    { "value": "manual", "label": "executionType.manual" },
+    { "value": "programada", "label": "executionType.programada" }
+  ],
+  "groups": [
+    { "value": "claro", "label": "group.claro" },
+    { "value": "entel", "label": "group.entel" },
+    { "value": "upc", "label": "group.upc" },
+    { "value": "movistar", "label": "group.movistar" }
+  ],
+  "channels": [
+    { "value": "whatsapp", "label": "channel.whatsapp" },
+    { "value": "correo", "label": "channel.correo" },
+    { "value": "phone", "label": "channel.phone" },
+    { "value": "sms", "label": "channel.sms" }
+  ],
+  "messageTypes": [
+    { "value": "hsm", "label": "messageType.hsm" },
+    { "value": "mail", "label": "messageType.mail" },
+    { "value": "html", "label": "messageType.html" },
+    { "value": "sms", "label": "messageType.sms" }
+  ],
+  "templates": {
+    "hsm": [
+      {
+        "value": "hsm_template_1",
+        "label": "HSM Template 1 - Welcome Message"
+      },
+      {
+        "value": "hsm_template_2",
+        "label": "HSM Template 2 - Promotional Offer"
+      }
+    ],
+    "mail": [
+      { "value": "mail_template_1", "label": "Email Template 1 - Newsletter" },
+      {
+        "value": "mail_template_2",
+        "label": "Email Template 2 - Product Launch"
+      }
+    ],
+    "html": [
+      { "value": "html_template_1", "label": "HTML Template 1 - Landing Page" },
+      { "value": "html_template_2", "label": "HTML Template 2 - Survey Form" }
+    ],
+    "sms": [
+      { "value": "sms_template_1", "label": "SMS Template 1 - Quick Alert" },
+      { "value": "sms_template_2", "label": "SMS Template 2 - Reminder" }
+    ]
+  }
+}

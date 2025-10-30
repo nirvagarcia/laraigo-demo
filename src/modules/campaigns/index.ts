@@ -4,6 +4,7 @@ export { default as GeneralTab } from "./components/GeneralTab";
 export { default as PersonsTab } from "./components/PersonsTab";
 export * from "./schemas/campaignSchema";
 export * from "./types/campaign";
+export * from "./types/selectOption";
 export * from "./styles/stylesCampaign";
-export * from "./data/mockData";
+export * from "./data/optionsService";
 export * from "./utils/formHelpers";
