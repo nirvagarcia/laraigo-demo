@@ -66,4 +66,108 @@ export const campaignSx = {
     p: 1,
     borderRadius: 2,
   },
+
+  formCard: {
+    borderRadius: 3,
+    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+    padding: 3,
+    transition: "none",
+    "&:hover": {
+      transform: "none",
+      boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+    },
+  },
+  headerActions: {
+    "& > *": {
+      borderRadius: 3,
+      px: 3,
+    },
+  },
+  saveButton: {
+    borderRadius: 3,
+    px: 4,
+    background: `linear-gradient(135deg, ${colors.primary[500]} 0%, #2196F3 100%)`,
+    "&:hover": {
+      background: `linear-gradient(135deg, ${colors.primary[600]} 0%, #1976D2 100%)`,
+    },
+  },
+
+  tabsContainer: {
+    borderBottom: 1,
+    borderColor: "divider",
+  },
+  tabs: {
+    px: 4,
+    "& .MuiTab-root": {
+      textTransform: "none",
+      fontWeight: 600,
+      fontSize: "1rem",
+      py: 2,
+    },
+    "& .MuiTabs-indicator": {
+      background: `linear-gradient(135deg, ${colors.primary[500]} 0%, #2196F3 100%)`,
+      height: 3,
+      borderRadius: "2px 2px 0 0",
+    },
+  },
+
+  field: {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2,
+      transition: "all 0.2s ease-in-out",
+      "& fieldset": {
+        borderColor: "rgba(0, 0, 0, 0.12)",
+        transition: "border-color 0.2s ease-in-out",
+      },
+      "&:hover fieldset": {
+        borderColor: colors.primary[500],
+        boxShadow: `0 0 0 1px ${colors.primary[500]}20`,
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: colors.primary[500],
+        borderWidth: "2px",
+        boxShadow: `0 0 0 3px ${colors.primary[500]}15`,
+      },
+    },
+    "& .MuiInputLabel-root": {
+      fontWeight: 500,
+    },
+    "& .MuiOutlinedInput-input": {
+      padding: "14px 14px",
+    },
+  },
+
+  personsPlaceholder: {
+    backgroundColor: "grey.50",
+    border: "2px dashed",
+    borderColor: "grey.300",
+    textAlign: "center",
+    py: 6,
+    borderRadius: 2,
+  },
+
+  listTitle: {
+    fontWeight: 700,
+    mb: 1,
+  },
+  createButton: {
+    px: 4,
+  },
+  campaignTitle: {
+    fontWeight: 600,
+    flex: 1,
+  },
+  campaignDescription: {
+    mb: 2,
+  },
+  campaignDate: {
+    mt: 2,
+  },
+
+  formHeader: {
+    mb: 3,
+  },
+  formGrid: {
+    p: 4,
+  },
 } as const;
