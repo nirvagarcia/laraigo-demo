@@ -1,5 +1,7 @@
 import { ReactNode } from "react";
-import { Box } from "@mui/material";
+import { useTheme } from "@mui/material";
+import { AppBox } from "@shared/components/ui/AppBox";
+import { layouts } from "@shared/styles/layouts";
 import { Sidebar } from "./Sidebar";
 
 interface MainLayoutProps {
@@ -8,24 +10,25 @@ interface MainLayoutProps {
 
 export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const sidebarWidth = 280;
+  const theme = useTheme();
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+    <AppBox direction="row" sx={layouts.pageLayout}>
       <Sidebar />
 
-      <Box
+      <AppBox
         component="main"
         sx={{
           flexGrow: 1,
           marginLeft: `${sidebarWidth}px`,
           minHeight: "100vh",
-          backgroundColor: "#fafafa",
+          backgroundColor: theme.palette.background.default,
           position: "relative",
         }}
       >
         {children}
-      </Box>
-    </Box>
+      </AppBox>
+    </AppBox>
   );
 };
 

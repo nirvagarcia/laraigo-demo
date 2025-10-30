@@ -1,7 +1,11 @@
-import { Box, Typography, Button, Fade } from "@mui/material";
+import { Fade, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@shared/components/ui/Button";
+import { AppText } from "@shared/components/ui/AppText";
+import { AppBox } from "@shared/components/ui/AppBox";
 import { PageContainer } from "@shared/components/layout/PageContainer";
 import { useTranslation } from "@app/providers/I18nProvider";
+import { comingSoonSx } from "../styles/stylesCommon";
 
 interface ComingSoonProps {
   titleKey?: string;
@@ -10,75 +14,40 @@ interface ComingSoonProps {
 export const ComingSoon: React.FC<ComingSoonProps> = ({ titleKey }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const theme = useTheme();
 
   return (
     <PageContainer centered fullHeight>
       <Fade in timeout={800}>
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          sx={{
-            textAlign: "center",
-            background: "linear-gradient(180deg, #f9f9ff 0%, #ffffff 100%)",
-            borderRadius: 3,
-            p: 6,
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
-            maxWidth: 600,
-            width: "100%",
-            transition: "all 0.3s ease-in-out",
-            "&:hover": {
-              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
-              transform: "translateY(-2px)",
-            },
-          }}
+        <AppBox
+          direction="column"
+          align="center"
+          justify="center"
+          gap={4}
+          sx={comingSoonSx.container}
         >
-          <Typography
+          <AppText
             variant="h3"
-            sx={{
-              fontWeight: 700,
-              mb: 3,
-              color: "primary.main",
-              fontSize: { xs: "2rem", md: "3rem" },
-            }}
+            color="primary"
+            weight="bold"
+            sx={comingSoonSx.title}
           >
             🚧 {titleKey ? t(titleKey) : t("common.coming_soon")}
-          </Typography>
+          </AppText>
 
-          <Typography
-            variant="h6"
-            color="text.secondary"
-            sx={{
-              mb: 4,
-              maxWidth: 450,
-              lineHeight: 1.6,
-              fontSize: { xs: "1rem", md: "1.25rem" },
-            }}
-          >
+          <AppText variant="h6" color="secondary" sx={comingSoonSx.description}>
             {t("common.coming_soon_description")}
-          </Typography>
+          </AppText>
 
           <Button
-            variant="contained"
-            color="primary"
+            variant="primary"
             size="large"
             onClick={() => navigate("/")}
-            sx={{
-              textTransform: "none",
-              px: 4,
-              py: 1.5,
-              fontSize: "1.1rem",
-              borderRadius: 2,
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-              "&:hover": {
-                boxShadow: "0 6px 16px rgba(0, 0, 0, 0.2)",
-              },
-            }}
+            sx={comingSoonSx.button(theme)}
           >
             {t("common.back_to_home")}
           </Button>
-        </Box>
+        </AppBox>
       </Fade>
     </PageContainer>
   );

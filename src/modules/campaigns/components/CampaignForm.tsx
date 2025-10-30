@@ -1,9 +1,14 @@
 import { useState, useCallback, memo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, Typography, Tabs, Tab, Stack, Card } from "@mui/material";
+import { Tabs, Tab, Stack } from "@mui/material";
 import { Button } from "@shared/components/ui/Button";
+import { Card } from "@shared/components/ui/Card";
+import { AppBox } from "@shared/components/ui/AppBox";
+import { AppText } from "@shared/components/ui/AppText";
 import { PageContainer } from "@shared/components/layout/PageContainer";
+import { globalStyles } from "@shared/styles/globals";
 import { useTranslation } from "@app/providers/I18nProvider";
+import { campaignSx } from "../styles/stylesCampaign";
 import { CampaignFormData } from "../schemas/campaignSchema";
 import { CampaignProvider, useCampaign } from "../contexts/CampaignContext";
 import { campaignService, CampaignError } from "../services/campaignService";
@@ -11,11 +16,6 @@ import { toast } from "../utils/toast";
 import { goToCampaignsList } from "../utils/navigation";
 import { GeneralTab } from "./GeneralTab";
 import { PersonsTab } from "./PersonsTab";
-import {
-  CampaignContainer,
-  CampaignHeader,
-  campaignSx,
-} from "../styles/stylesCampaign";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -31,7 +31,7 @@ const TabPanel = memo<TabPanelProps>(({ children, value, index }) => {
       id={`campaign-tabpanel-${index}`}
       aria-labelledby={`campaign-tab-${index}`}
     >
-      {value === index && <Box>{children}</Box>}
+      {value === index && <AppBox>{children}</AppBox>}
     </div>
   );
 });
@@ -86,19 +86,25 @@ const CampaignFormInner: React.FC = () => {
 
   return (
     <PageContainer>
-      <CampaignContainer>
-        <CampaignHeader>
-          <Box>
-            <Typography variant="h4" sx={campaignSx.listTitle}>
+      <AppBox
+        sx={{ ...globalStyles.container, ...campaignSx.campaignFormContainer }}
+      >
+        <AppBox sx={campaignSx.campaignFormHeader}>
+          <AppBox>
+            <AppText variant="h4" sx={campaignSx.campaignFormTitle}>
               {pageTitle}
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
+            </AppText>
+            <AppText variant="body1" color="secondary">
               {isEditing
                 ? t("campaign.form.description.edit")
                 : t("campaign.form.description.create")}
-            </Typography>
-          </Box>
-          <Stack direction="row" spacing={2} sx={campaignSx.headerActions}>
+            </AppText>
+          </AppBox>
+          <Stack
+            direction="row"
+            spacing={2}
+            sx={campaignSx.campaignFormActions}
+          >
             <Button
               variant="outlined"
               onClick={handleCancel}
@@ -111,22 +117,22 @@ const CampaignFormInner: React.FC = () => {
               variant="primary"
               disabled={isSubmitting}
               form="campaign-form"
-              sx={campaignSx.saveButton}
+              sx={campaignSx.campaignFormSaveButton}
             >
               {isSubmitting
                 ? t("campaign.form.saving")
                 : t("buttons.save_campaign")}
             </Button>
           </Stack>
-        </CampaignHeader>
+        </AppBox>
 
-        <Card elevation={1} sx={campaignSx.formCard}>
+        <Card sx={campaignSx.campaignFormCard}>
           <form id="campaign-form" onSubmit={handleSubmit(onSubmit)}>
-            <Box sx={campaignSx.tabsContainer}>
+            <AppBox sx={campaignSx.campaignFormTabsContainer}>
               <Tabs
                 value={activeTab}
                 onChange={handleTabChange}
-                sx={campaignSx.tabs}
+                sx={campaignSx.campaignFormTabs}
               >
                 <Tab
                   label={`📋 ${t("tabs.general")}`}
@@ -139,9 +145,9 @@ const CampaignFormInner: React.FC = () => {
                   aria-controls="campaign-tabpanel-1"
                 />
               </Tabs>
-            </Box>
+            </AppBox>
 
-            <Box sx={campaignSx.formGrid}>
+            <AppBox sx={campaignSx.campaignFormTabPanel}>
               <TabPanel value={activeTab} index={0}>
                 <GeneralTab />
               </TabPanel>
@@ -149,10 +155,10 @@ const CampaignFormInner: React.FC = () => {
               <TabPanel value={activeTab} index={1}>
                 <PersonsTab />
               </TabPanel>
-            </Box>
+            </AppBox>
           </form>
         </Card>
-      </CampaignContainer>
+      </AppBox>
     </PageContainer>
   );
 };

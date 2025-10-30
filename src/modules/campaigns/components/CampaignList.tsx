@@ -1,20 +1,22 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Typography, Stack, IconButton, Skeleton } from "@mui/material";
+import { Skeleton, Stack } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Button } from "@shared/components/ui/Button";
+import { Card } from "@shared/components/ui/Card";
 import { Chip } from "@shared/components/ui/Chip";
+import { AppBox } from "@shared/components/ui/AppBox";
+import { AppText } from "@shared/components/ui/AppText";
+import { AppIconButton } from "@shared/components/ui/AppIconButton";
+
 import { PageContainer } from "@shared/components/layout/PageContainer";
+
+import { globalStyles } from "@shared/styles/globals";
 import { useTranslation } from "@app/providers/I18nProvider";
+import { campaignSx } from "../styles/stylesCampaign";
 import { useCampaigns, useCampaignStatus } from "../hooks";
 import { goToNewCampaign, goToEditCampaign } from "../utils/navigation";
-import {
-  CampaignContainer,
-  CampaignHeader,
-  CampaignCard,
-  campaignSx,
-} from "../styles/stylesCampaign";
 
 export const CampaignList: React.FC = () => {
   const { t } = useTranslation();
@@ -45,22 +47,19 @@ export const CampaignList: React.FC = () => {
   );
 
   const renderSkeletonCard = () => (
-    <CampaignCard elevation={0}>
-      <Box sx={campaignSx.formHeader}>
+    <Card sx={campaignSx.listSkeleton}>
+      <AppBox mb={3}>
         <Stack
           direction="row"
           justifyContent="space-between"
           alignItems="start"
-          sx={campaignSx.formHeader}
+          sx={campaignSx.skeletonHeader}
         >
           <Skeleton
             variant="text"
             width="60%"
             height={32}
-            sx={{
-              fontSize: "1.25rem",
-              transform: "scale(1, 0.8)",
-            }}
+            sx={campaignSx.skeletonTitle}
           />
           <Stack direction="row" spacing={1}>
             <Skeleton
@@ -81,140 +80,113 @@ export const CampaignList: React.FC = () => {
           variant="rounded"
           width={80}
           height={24}
-          sx={{
-            borderRadius: 3,
-            mt: 1,
-          }}
+          sx={campaignSx.skeletonActions}
           animation="wave"
         />
-      </Box>
+      </AppBox>
 
       <Skeleton
         variant="text"
         width="85%"
         height={20}
-        sx={{
-          mb: 1,
-          fontSize: "0.875rem",
-          transform: "scale(1, 0.8)",
-        }}
+        sx={campaignSx.skeletonDescription}
         animation="wave"
       />
       <Skeleton
         variant="text"
         width="70%"
         height={20}
-        sx={{
-          fontSize: "0.875rem",
-          transform: "scale(1, 0.8)",
-          mb: 2,
-        }}
+        sx={campaignSx.skeletonDescription}
         animation="wave"
       />
 
-      <Box sx={campaignSx.campaignDate}>
+      <AppBox mt={2}>
         <Skeleton
           variant="text"
           width="40%"
           height={16}
-          sx={{
-            fontSize: "0.75rem",
-            transform: "scale(1, 0.6)",
-          }}
+          sx={campaignSx.skeletonDate}
           animation="wave"
         />
-      </Box>
-    </CampaignCard>
+      </AppBox>
+    </Card>
   );
 
   if (isLoading) {
     return (
       <PageContainer>
-        <CampaignContainer>
-          <CampaignHeader>
-            <Box>
+        <AppBox
+          sx={{ ...globalStyles.container, ...campaignSx.loadingContainer }}
+        >
+          <AppBox sx={campaignSx.listHeaderContainer}>
+            <AppBox>
               <Skeleton
                 variant="text"
                 width={280}
                 height={48}
-                sx={{
-                  fontSize: "2rem",
-                  mb: 1,
-                  transform: "scale(1, 0.85)",
-                }}
+                sx={campaignSx.skeletonTitle}
                 animation="wave"
               />
               <Skeleton
                 variant="text"
                 width={350}
                 height={24}
-                sx={{
-                  fontSize: "1rem",
-                  transform: "scale(1, 0.8)",
-                }}
+                sx={campaignSx.skeletonDescription}
                 animation="wave"
               />
-            </Box>
+            </AppBox>
             <Skeleton
               variant="rounded"
               width={160}
               height={40}
-              sx={{
-                borderRadius: 2,
-                bgcolor: "primary.50",
-              }}
+              sx={campaignSx.skeletonActions}
               animation="wave"
             />
-          </CampaignHeader>
+          </AppBox>
 
-          <Box sx={campaignSx.listContainer}>
+          <AppBox sx={campaignSx.loadingGrid}>
             {Array.from({ length: 3 }).map((_, index) => (
               <div key={`skeleton-${index}`}>{renderSkeletonCard()}</div>
             ))}
-          </Box>
-        </CampaignContainer>
+          </AppBox>
+        </AppBox>
       </PageContainer>
     );
   }
 
-  // Error state
   if (error) {
     return (
       <PageContainer>
-        <CampaignContainer>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              minHeight: "400px",
-              justifyContent: "center",
-            }}
-          >
-            <Typography variant="h6" color="error" gutterBottom>
+        <AppBox
+          sx={{ ...globalStyles.container, ...campaignSx.errorContainer }}
+        >
+          <AppBox sx={campaignSx.errorContent}>
+            <AppText variant="h6" color="error" gutterBottom>
               {t("campaign.error")}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
+            </AppText>
+            <AppText variant="body2" color="secondary">
               {error}
-            </Typography>
-          </Box>
-        </CampaignContainer>
+            </AppText>
+          </AppBox>
+        </AppBox>
       </PageContainer>
     );
   }
 
   return (
     <PageContainer>
-      <CampaignContainer>
-        <CampaignHeader>
-          <Box>
-            <Typography variant="h4" sx={campaignSx.listTitle}>
+      <AppBox
+        sx={{ ...globalStyles.container, ...campaignSx.loadingContainer }}
+      >
+        <AppBox sx={campaignSx.listHeaderContainer}>
+          <AppBox>
+            <AppText variant="h4" sx={campaignSx.listTitle}>
               📢 {t("campaign.list")}
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
+            </AppText>
+            <AppText variant="body1" color="secondary">
               {t("campaign.manage_description")}
-            </Typography>
-          </Box>
+            </AppText>
+          </AppBox>
           <Button
             variant="primary"
             onClick={handleCreateCampaign}
@@ -222,37 +194,36 @@ export const CampaignList: React.FC = () => {
           >
             ➕ {t("buttons.create_campaign")}
           </Button>
-        </CampaignHeader>
+        </AppBox>
 
-        <Box sx={campaignSx.listContainer}>
+        <AppBox sx={campaignSx.campaignGrid}>
           {campaigns.map((campaign) => (
-            <CampaignCard key={campaign.id} elevation={0}>
-              <Box sx={campaignSx.formHeader}>
+            <Card key={campaign.id} sx={campaignSx.campaignCardContainer}>
+              <AppBox sx={campaignSx.campaignCardHeader}>
                 <Stack
                   direction="row"
                   justifyContent="space-between"
                   alignItems="start"
-                  sx={campaignSx.formHeader}
+                  sx={campaignSx.skeletonHeader}
                 >
-                  <Typography variant="h6" sx={campaignSx.campaignTitle}>
+                  <AppText variant="h6" sx={campaignSx.campaignCardTitle}>
                     {campaign.title}
-                  </Typography>
+                  </AppText>
                   <Stack direction="row" spacing={1}>
-                    <IconButton
+                    <AppIconButton
                       size="small"
                       onClick={() => handleEditCampaign(campaign.id)}
-                      sx={campaignSx.actionButton}
+                      sx={campaignSx.editButton}
                     >
                       <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
+                    </AppIconButton>
+                    <AppIconButton
                       size="small"
                       onClick={() => handleDeleteCampaign(campaign.id)}
-                      sx={campaignSx.actionButton}
-                      color="error"
+                      sx={campaignSx.deleteButton}
                     >
                       <DeleteIcon fontSize="small" />
-                    </IconButton>
+                    </AppIconButton>
                   </Stack>
                 </Stack>
 
@@ -260,30 +231,30 @@ export const CampaignList: React.FC = () => {
                   label={getStatusLabel(campaign.status)}
                   color={getStatusColor(campaign.status)}
                   size="small"
-                  sx={campaignSx.statusChip}
+                  sx={campaignSx.statusChipContainer}
                 />
-              </Box>
+              </AppBox>
 
               {campaign.description && (
-                <Typography
+                <AppText
                   variant="body2"
-                  color="text.secondary"
-                  sx={campaignSx.campaignDescription}
+                  color="secondary"
+                  sx={campaignSx.campaignListDescription.sx}
                 >
                   {campaign.description}
-                </Typography>
+                </AppText>
               )}
 
-              <Box sx={campaignSx.campaignDate}>
-                <Typography variant="caption" sx={campaignSx.dateText}>
+              <AppBox sx={campaignSx.campaignDateContainer}>
+                <AppText variant="caption" sx={campaignSx.campaignDateText}>
                   📅 {campaign.startDate.toLocaleDateString()} -{" "}
                   {campaign.endDate.toLocaleDateString()}
-                </Typography>
-              </Box>
-            </CampaignCard>
+                </AppText>
+              </AppBox>
+            </Card>
           ))}
-        </Box>
-      </CampaignContainer>
+        </AppBox>
+      </AppBox>
     </PageContainer>
   );
 };

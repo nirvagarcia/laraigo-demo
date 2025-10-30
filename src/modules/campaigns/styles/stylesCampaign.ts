@@ -182,4 +182,249 @@ export const campaignSx = {
     textDecoration: "underline",
     p: 0,
   },
+
+  personsCard: {
+    border: 1,
+    borderColor: "divider",
+    borderStyle: "dashed",
+    backgroundColor: "grey.50",
+    textAlign: "center",
+    p: 4,
+  },
+
+  personsCardContent: {
+    "&:last-child": { pb: 4 },
+  },
+
+  personsTitle: {
+    color: "text.secondary",
+    gutterBottom: true,
+  },
+
+  personsMainDescription: {
+    color: "text.secondary",
+    mb: 2,
+  },
+
+  personsFeaturesDescription: {
+    color: "text.disabled",
+    mb: 2,
+  },
+
+  personsFeaturesList: {
+    listStyle: "none",
+    padding: 0,
+    margin: 0,
+    "& li": {
+      color: "text.secondary",
+      fontSize: "0.875rem",
+      mb: 1,
+      "&:before": {
+        content: "'•'",
+        color: "primary.main",
+        mr: 1,
+      },
+    },
+  },
+
+  campaignFormContainer: {
+    py: 4,
+  },
+
+  campaignFormHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    mb: 4,
+    gap: 3,
+    flexWrap: { xs: "wrap", md: "nowrap" },
+  },
+
+  campaignFormTitle: {
+    fontWeight: 700,
+    mb: 1,
+    color: "text.primary",
+  },
+
+  campaignFormActions: {
+    minWidth: "auto",
+    flexShrink: 0,
+  },
+
+  campaignFormSaveButton: {
+    minWidth: "auto",
+    px: 3,
+    py: 1.5,
+    fontWeight: 600,
+  },
+
+  campaignFormCard: {
+    p: 0,
+  },
+
+  campaignFormTabsContainer: {
+    borderBottom: 1,
+    borderColor: "divider",
+    px: 3,
+    pt: 3,
+  },
+
+  campaignFormTabs: {
+    minHeight: "auto",
+    "& .MuiTab-root": {
+      minHeight: "auto",
+      py: 1.5,
+      px: 2,
+      fontSize: "0.875rem",
+      fontWeight: 500,
+    },
+  },
+
+  campaignFormTabPanel: {
+    p: 3,
+  },
+
+  listHeaderContainer: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    mb: 4,
+    gap: 3,
+    flexWrap: { xs: "wrap", md: "nowrap" },
+  },
+
+  listSkeleton: {
+    mb: 2,
+  },
+
+  skeletonHeader: {
+    mb: 2,
+  },
+
+  skeletonTitle: {
+    fontSize: "1.25rem",
+    transform: "scale(1, 0.8)",
+  },
+
+  skeletonActions: {
+    borderRadius: 3,
+    mt: 1,
+  },
+
+  skeletonDescription: {
+    mb: 1,
+    fontSize: "0.875rem",
+    transform: "scale(1, 0.8)",
+  },
+
+  skeletonDate: {
+    fontSize: "0.75rem",
+    transform: "scale(1, 0.6)",
+  },
+
+  loadingContainer: {
+    py: 4,
+  },
+
+  loadingGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      xs: "1fr",
+      md: "1fr 1fr",
+      lg: "1fr 1fr 1fr",
+    },
+    gap: 3,
+    mt: 3,
+  },
+
+  errorContainer: {
+    py: 4,
+  },
+
+  errorContent: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    minHeight: "400px",
+    justifyContent: "center",
+  },
+
+  campaignGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      xs: "1fr",
+      md: "1fr 1fr",
+      lg: "1fr 1fr 1fr",
+    },
+    gap: 3,
+    mt: 3,
+  },
+
+  campaignCardContainer: {
+    mb: 2,
+  },
+
+  campaignCardHeader: {
+    mb: 3,
+  },
+
+  campaignCardTitleRow: {
+    direction: "row",
+    justifyContent: "space-between",
+    alignItems: "start",
+    sx: { mb: 2 },
+  },
+
+  campaignCardTitle: {
+    fontWeight: 600,
+    flex: 1,
+    color: "text.primary",
+  },
+
+  campaignCardActions: {
+    direction: "row",
+    spacing: 1,
+  },
+
+  editButton: {
+    minWidth: "auto",
+    p: 1,
+    borderRadius: 2,
+    color: "text.secondary",
+    "&:hover": {
+      backgroundColor: "action.hover",
+      color: "primary.main",
+    },
+  },
+
+  deleteButton: {
+    minWidth: "auto",
+    p: 1,
+    borderRadius: 2,
+    color: "text.secondary",
+    "&:hover": {
+      backgroundColor: "error.50",
+      color: "error.main",
+    },
+  },
+
+  statusChipContainer: {
+    fontWeight: 600,
+    borderRadius: 2,
+  },
+
+  campaignListDescription: {
+    variant: "body2",
+    color: "text.secondary",
+    sx: { mb: 2 },
+  },
+
+  campaignDateContainer: {
+    mt: 2,
+  },
+
+  campaignDateText: {
+    color: "text.secondary",
+    fontSize: "0.875rem",
+  },
 } as const;
