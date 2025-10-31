@@ -3,6 +3,7 @@ import { MainLayout } from "@app/layouts/MainLayout";
 import { Laraigo } from "@modules/home/components/Laraigo";
 import { CampaignList } from "@modules/campaigns/components/CampaignList";
 import { CampaignForm } from "@modules/campaigns/components/CampaignForm";
+import { CampaignsProvider } from "@modules/campaigns/contexts/CampaignsProvider";
 import ComingSoon from "@modules/common/pages/ComingSoon";
 
 export const AppRoutes: React.FC = () => {
@@ -15,7 +16,9 @@ export const AppRoutes: React.FC = () => {
           path="/campaigns"
           element={
             <MainLayout>
-              <CampaignList />
+              <CampaignsProvider>
+                <CampaignList />
+              </CampaignsProvider>
             </MainLayout>
           }
         />
@@ -24,7 +27,9 @@ export const AppRoutes: React.FC = () => {
           path="/campaigns/new"
           element={
             <MainLayout>
-              <CampaignForm />
+              <CampaignsProvider>
+                <CampaignForm />
+              </CampaignsProvider>
             </MainLayout>
           }
         />
@@ -33,7 +38,9 @@ export const AppRoutes: React.FC = () => {
           path="/campaigns/edit/:id"
           element={
             <MainLayout>
-              <CampaignForm />
+              <CampaignsProvider>
+                <CampaignForm />
+              </CampaignsProvider>
             </MainLayout>
           }
         />

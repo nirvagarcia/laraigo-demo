@@ -48,47 +48,247 @@ export const FormContainer = styled(Box)(({ theme }) => ({
 export const campaignSx = {
   listContainer: {
     display: "grid",
-    gridTemplateColumns: { xs: "1fr", md: "1fr 1fr", lg: "1fr 1fr 1fr" },
-    gap: 3,
-    mt: 3,
-  },
-  statusChip: {
-    fontWeight: 600,
-    borderRadius: 2,
-  },
-  dateText: {
-    color: colors.neutral[600],
-    fontSize: "0.875rem",
-  },
-  actionButton: {
-    minWidth: "auto",
-    p: 1,
-    borderRadius: 2,
+    gridTemplateColumns: {
+      xs: "1fr",
+      md: "repeat(auto-fit, minmax(320px, 1fr))",
+    },
+    gap: 4,
+    mt: 4,
+    mb: 4,
   },
 
-  formCard: {
-    borderRadius: 3,
-    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-    padding: 3,
-    transition: "none",
+  modernCard: {
+    borderRadius: "20px",
+    background: "rgba(255, 255, 255, 0.9)",
+    backdropFilter: "blur(20px)",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+    transition: "all 0.25s ease",
+    overflow: "hidden",
+    position: "relative",
+    p: 3,
+    cursor: "pointer",
+    animation: "fadeInGrow 0.5s ease-out",
+    "&:before": {
+      content: '""',
+      position: "absolute",
+      top: 0,
+      left: "-100%",
+      width: "100%",
+      height: "100%",
+      background:
+        "linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)",
+      transition: "left 0.5s ease",
+    },
     "&:hover": {
-      transform: "none",
-      boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+      transform: "translateY(-4px)",
+      boxShadow: "0 12px 40px rgba(0, 0, 0, 0.15)",
+      background: "rgba(255, 255, 255, 0.95)",
+      "&:before": {
+        left: "100%",
+      },
+    },
+    "&:focus": {
+      outline: "none",
+      boxShadow: `0 0 0 3px ${colors.primary[200]}, 0 12px 40px rgba(0, 0, 0, 0.15)`,
+      borderColor: "primary.main",
+    },
+    "&:focus-visible": {
+      outline: `2px solid ${colors.primary[500]}`,
+      outlineOffset: "2px",
+    },
+    "@keyframes fadeInGrow": {
+      "0%": {
+        opacity: 0,
+        transform: "scale(0.95) translateY(20px)",
+      },
+      "100%": {
+        opacity: 1,
+        transform: "scale(1) translateY(0)",
+      },
     },
   },
-  headerActions: {
-    "& > *": {
-      borderRadius: 3,
-      px: 3,
+
+  cardTintActive: {
+    background:
+      "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%), rgba(0, 200, 83, 0.05)",
+  },
+  cardTintDraft: {
+    background:
+      "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%), rgba(255, 193, 7, 0.05)",
+  },
+  cardTintPaused: {
+    background:
+      "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%), rgba(33, 150, 243, 0.05)",
+  },
+
+  cardContent: {
+    p: 3,
+  },
+
+  cardHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    mb: 3,
+    gap: 2,
+  },
+
+  cardTitle: {
+    fontWeight: 700,
+    fontSize: "1.25rem",
+    lineHeight: 1.3,
+    letterSpacing: "-0.02em",
+    color: "text.primary",
+    flex: 1,
+    mb: 1,
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+
+  cardDescription: {
+    fontSize: "0.95rem",
+    lineHeight: 1.5,
+    color: "text.secondary",
+    mb: 2.5,
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+  },
+
+  statusBadge: {
+    borderRadius: "20px",
+    px: 2,
+    py: 0.5,
+    fontSize: "0.75rem",
+    fontWeight: 600,
+    letterSpacing: "0.025em",
+    textTransform: "uppercase",
+    border: "none",
+    background:
+      "linear-gradient(135deg, var(--status-color-main) 0%, var(--status-color-light) 100%)",
+    color: "white",
+    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+  },
+
+  actionButtonsContainer: {
+    display: "flex",
+    gap: 1,
+  },
+
+  glassIconButton: {
+    minWidth: "auto",
+    width: "36px",
+    height: "36px",
+    borderRadius: "12px",
+    background: "rgba(255, 255, 255, 0.7)",
+    backdropFilter: "blur(10px)",
+    border: "1px solid rgba(255, 255, 255, 0.3)",
+    color: "text.secondary",
+    opacity: 0.7,
+    transition: "all 0.2s ease",
+    position: "relative",
+    overflow: "hidden",
+    "&:before": {
+      content: '""',
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      width: "0",
+      height: "0",
+      borderRadius: "50%",
+      background: "rgba(255, 255, 255, 0.4)",
+      transition: "all 0.25s ease",
+      transform: "translate(-50%, -50%)",
+    },
+    "&:hover": {
+      opacity: 1,
+      background: "rgba(255, 255, 255, 0.95)",
+      transform: "translateY(-1px) scale(1.05)",
+      boxShadow: "0 6px 16px rgba(0, 0, 0, 0.1)",
+      color: "primary.main",
+      "&:before": {
+        width: "120%",
+        height: "120%",
+      },
+    },
+    "&:active": {
+      transform: "translateY(0) scale(0.98)",
+    },
+    "&:focus": {
+      outline: "none",
+      opacity: 1,
+      boxShadow: `0 0 0 2px ${colors.primary[300]}`,
+      borderColor: "primary.main",
+    },
+    "&:focus-visible": {
+      outline: `2px solid ${colors.primary[500]}`,
+      outlineOffset: "2px",
     },
   },
-  saveButton: {
-    borderRadius: 3,
+
+  cardActions: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    display: "flex",
+    gap: 0.5,
+    opacity: 0,
+    transition: "opacity 0.2s ease",
+    ".modernCard:hover &": {
+      opacity: 1,
+    },
+  },
+
+  deleteIconButton: {
+    "&:hover": {
+      background: "rgba(248, 113, 113, 0.1)",
+      color: "error.main",
+      borderColor: "rgba(248, 113, 113, 0.2)",
+    },
+  },
+
+  createCampaignButton: {
+    borderRadius: "12px",
     px: 4,
-    background: `linear-gradient(135deg, ${colors.primary[500]} 0%, #2196F3 100%)`,
+    py: 1.5,
+    fontSize: "0.95rem",
+    fontWeight: 600,
+    letterSpacing: "0.01em",
+    background: `linear-gradient(135deg, ${colors.primary[500]} 0%, ${colors.primary[600]} 50%, #2196F3 100%)`,
+    boxShadow: "0 4px 16px rgba(0, 0, 0, 0.12)",
+    border: "none",
+    color: "white",
+    transition: "all 0.25s ease",
     "&:hover": {
-      background: `linear-gradient(135deg, ${colors.primary[600]} 0%, #1976D2 100%)`,
+      background: `linear-gradient(135deg, ${colors.primary[600]} 0%, ${colors.primary[700]} 50%, #1976D2 100%)`,
+      transform: "translateY(-1px)",
+      boxShadow: "0 8px 25px rgba(0, 0, 0, 0.18)",
     },
+    "&:active": {
+      transform: "translateY(0px)",
+    },
+  },
+
+  listHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    mb: 4,
+    gap: 3,
+    flexWrap: { xs: "wrap", md: "nowrap" },
+  },
+
+  listHeaderContent: {
+    flex: 1,
+  },
+
+  listSubtitle: {
+    fontSize: "1rem",
+    color: "text.secondary",
+    lineHeight: 1.5,
   },
 
   tabsContainer: {
@@ -146,11 +346,36 @@ export const campaignSx = {
   },
 
   listTitle: {
-    fontWeight: 700,
+    fontSize: "2rem",
+    fontWeight: 800,
+    letterSpacing: "-0.02em",
+    color: "text.primary",
     mb: 1,
+    background: `linear-gradient(135deg, ${colors.primary[600]} 0%, ${colors.primary[800]} 100%)`,
+    backgroundClip: "text",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
   },
   createButton: {
+    borderRadius: "12px",
     px: 4,
+    py: 1.5,
+    fontSize: "0.95rem",
+    fontWeight: 600,
+    letterSpacing: "0.01em",
+    background: `linear-gradient(135deg, ${colors.primary[500]} 0%, ${colors.primary[600]} 50%, #2196F3 100%)`,
+    boxShadow: "0 4px 16px rgba(0, 0, 0, 0.12)",
+    border: "none",
+    color: "white",
+    transition: "all 0.25s ease",
+    "&:hover": {
+      background: `linear-gradient(135deg, ${colors.primary[600]} 0%, ${colors.primary[700]} 50%, #1976D2 100%)`,
+      transform: "translateY(-1px)",
+      boxShadow: "0 8px 25px rgba(0, 0, 0, 0.18)",
+    },
+    "&:active": {
+      transform: "translateY(0px)",
+    },
   },
   campaignTitle: {
     fontWeight: 600,
@@ -241,9 +466,14 @@ export const campaignSx = {
   },
 
   campaignFormTitle: {
-    fontWeight: 700,
+    fontSize: "1.875rem",
+    fontWeight: 800,
+    letterSpacing: "-0.02em",
     mb: 1,
-    color: "text.primary",
+    background: `linear-gradient(135deg, ${colors.primary[600]} 0%, ${colors.primary[800]} 100%)`,
+    backgroundClip: "text",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
   },
 
   campaignFormActions: {
@@ -253,13 +483,49 @@ export const campaignSx = {
 
   campaignFormSaveButton: {
     minWidth: "auto",
-    px: 3,
+    px: 4,
     py: 1.5,
+    borderRadius: "12px",
+    fontSize: "0.95rem",
     fontWeight: 600,
+    letterSpacing: "0.01em",
+    background: `linear-gradient(135deg, ${colors.primary[500]} 0%, ${colors.primary[600]} 50%, #2196F3 100%)`,
+    boxShadow: "0 4px 16px rgba(0, 0, 0, 0.12)",
+    border: "none",
+    color: "white",
+    transition: "all 0.25s ease",
+    "&:hover": {
+      background: `linear-gradient(135deg, ${colors.primary[600]} 0%, ${colors.primary[700]} 50%, #1976D2 100%)`,
+      transform: "translateY(-1px)",
+      boxShadow: "0 8px 25px rgba(0, 0, 0, 0.18)",
+    },
+    "&:active": {
+      transform: "translateY(0px)",
+    },
+    "&:disabled": {
+      background: "rgba(0, 0, 0, 0.12)",
+      transform: "none",
+      boxShadow: "none",
+      cursor: "not-allowed",
+    },
+    "&:focus": {
+      outline: "none",
+      boxShadow: `0 0 0 3px ${colors.primary[200]}, 0 8px 25px rgba(0, 0, 0, 0.18)`,
+    },
+    "&:focus-visible": {
+      outline: `2px solid ${colors.primary[500]}`,
+      outlineOffset: "2px",
+    },
   },
 
   campaignFormCard: {
     p: 0,
+    background:
+      "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%)",
+    backdropFilter: "blur(10px)",
+    border: "1px solid rgba(255, 255, 255, 0.3)",
+    borderRadius: "16px",
+    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)",
   },
 
   campaignFormTabsContainer: {
@@ -349,17 +615,6 @@ export const campaignSx = {
     justifyContent: "center",
   },
 
-  campaignGrid: {
-    display: "grid",
-    gridTemplateColumns: {
-      xs: "1fr",
-      md: "1fr 1fr",
-      lg: "1fr 1fr 1fr",
-    },
-    gap: 3,
-    mt: 3,
-  },
-
   campaignCardContainer: {
     mb: 2,
   },
@@ -426,5 +681,128 @@ export const campaignSx = {
   campaignDateText: {
     color: "text.secondary",
     fontSize: "0.875rem",
+  },
+
+  emptyState: {
+    textAlign: "center",
+    py: 8,
+    px: 4,
+  },
+
+  emptyStateIcon: {
+    fontSize: "4rem",
+    color: "text.disabled",
+    mb: 2,
+  },
+
+  emptyStateTitle: {
+    fontSize: "1.25rem",
+    fontWeight: 600,
+    color: "text.secondary",
+    mb: 1,
+  },
+
+  emptyStateSubtitle: {
+    color: "text.disabled",
+    mb: 3,
+    maxWidth: "400px",
+    mx: "auto",
+  },
+
+  campaignGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      xs: "1fr",
+      sm: "repeat(auto-fill, minmax(360px, 1fr))",
+    },
+    gap: 3,
+    mt: 3,
+    "& > *": {
+      animation: "fadeInUpStagger 0.6s ease-out backwards",
+    },
+    "& > *:nth-of-type(1)": { animationDelay: "0.1s" },
+    "& > *:nth-of-type(2)": { animationDelay: "0.2s" },
+    "& > *:nth-of-type(3)": { animationDelay: "0.3s" },
+    "& > *:nth-of-type(4)": { animationDelay: "0.4s" },
+    "& > *:nth-of-type(5)": { animationDelay: "0.5s" },
+    "& > *:nth-of-type(6)": { animationDelay: "0.6s" },
+    "@keyframes fadeInUpStagger": {
+      "0%": {
+        opacity: 0,
+        transform: "translateY(30px) scale(0.95)",
+      },
+      "100%": {
+        opacity: 1,
+        transform: "translateY(0) scale(1)",
+      },
+    },
+  },
+
+  loadingCard: {
+    minHeight: "200px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background:
+      "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%)",
+    backdropFilter: "blur(10px)",
+    border: "1px solid rgba(255, 255, 255, 0.3)",
+    borderRadius: "16px",
+    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)",
+    position: "relative",
+    overflow: "hidden",
+    "&:before": {
+      content: '""',
+      position: "absolute",
+      top: 0,
+      left: "-100%",
+      width: "100%",
+      height: "100%",
+      background:
+        "linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent)",
+      animation: "shimmer 1.5s ease-in-out infinite",
+    },
+    "@keyframes shimmer": {
+      "0%": { left: "-100%" },
+      "100%": { left: "100%" },
+    },
+  },
+
+  skeletonPulse: {
+    animation: "pulse 1.5s ease-in-out infinite",
+    "@keyframes pulse": {
+      "0%, 100%": { opacity: 1 },
+      "50%": { opacity: 0.5 },
+    },
+  },
+
+  errorCard: {
+    background:
+      "linear-gradient(135deg, rgba(255, 243, 243, 0.9) 0%, rgba(255, 236, 236, 0.6) 100%)",
+    border: "1px solid rgba(239, 68, 68, 0.3)",
+    borderLeft: "4px solid #EF4444",
+    color: "error.main",
+    animation: "shake 0.5s ease-in-out",
+    "@keyframes shake": {
+      "0%, 100%": { transform: "translateX(0)" },
+      "25%": { transform: "translateX(-5px)" },
+      "75%": { transform: "translateX(5px)" },
+    },
+  },
+
+  loadingButton: {
+    position: "relative",
+    "&:disabled": {
+      background: `linear-gradient(135deg, ${colors.primary[300]} 0%, ${colors.primary[400]} 100%)`,
+      cursor: "wait",
+      "& .MuiCircularProgress-root": {
+        color: "white",
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        marginTop: "-12px",
+        marginLeft: "-12px",
+      },
+    },
   },
 } as const;

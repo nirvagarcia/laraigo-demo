@@ -1,4 +1,4 @@
-import { useEffect, useMemo, memo, useState } from "react";
+import { useMemo, memo, useEffect } from "react";
 import { Grid, TextField, MenuItem, Box } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
@@ -7,8 +7,6 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { Controller } from "react-hook-form";
 import { useTranslation } from "@app/providers/I18nProvider";
 import { useCampaign } from "../contexts/CampaignContext";
-import { SelectOption } from "../types/selectOption";
-import { optionsService } from "../data/optionsService";
 import { isScheduledExecution } from "../utils/formHelpers";
 
 export const GeneralTab = memo(() => {
@@ -19,16 +17,8 @@ export const GeneralTab = memo(() => {
     watch,
     updateField,
     formState: { errors },
+    bootstrapData,
   } = useCampaign();
-
-  const [sources, setSources] = useState<SelectOption[]>([]);
-  const [executionTypes, setExecutionTypes] = useState<SelectOption[]>([]);
-  const [groups, setGroups] = useState<SelectOption[]>([]);
-  const [channels, setChannels] = useState<SelectOption[]>([]);
-  const [messageTypes, setMessageTypes] = useState<SelectOption[]>([]);
-  const [templates, setTemplates] = useState<Record<string, SelectOption[]>>(
-    {}
-  );
 
   const executionType = watch("executionType");
   const messageType = watch("messageType");
@@ -41,17 +31,12 @@ export const GeneralTab = memo(() => {
     return typeof error?.message === "string" ? error.message : "";
   };
 
-  useEffect(() => {
-    optionsService.getSources().then(setSources).catch(console.error);
-    optionsService
-      .getExecutionTypes()
-      .then(setExecutionTypes)
-      .catch(console.error);
-    optionsService.getGroups().then(setGroups).catch(console.error);
-    optionsService.getChannels().then(setChannels).catch(console.error);
-    optionsService.getMessageTypes().then(setMessageTypes).catch(console.error);
-    optionsService.getTemplates().then(setTemplates).catch(console.error);
-  }, []);
+  const sources = bootstrapData?.sources || [];
+  const executionTypes = bootstrapData?.executionTypes || [];
+  const groups = bootstrapData?.groups || [];
+  const channels = bootstrapData?.channels || [];
+  const messageTypes = bootstrapData?.messageTypes || [];
+  const templates = bootstrapData?.templates || {};
 
   const translatedSourceOptions = useMemo(
     () =>

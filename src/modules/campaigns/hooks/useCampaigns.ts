@@ -122,6 +122,20 @@ export const useCampaigns = () => {
     }
   }, []);
 
+  const getCampaign = useCallback(async (id: string): Promise<Campaign> => {
+    setError(null);
+
+    try {
+      const campaign = await campaignApiService.getById(id);
+      return campaign;
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to get campaign";
+      setError(errorMessage);
+      throw err;
+    }
+  }, []);
+
   const saveCampaign = useCallback(
     async (data: CampaignFormData, id?: string): Promise<Campaign> => {
       return id ? updateCampaign(id, data) : createCampaign(data);
@@ -133,6 +147,7 @@ export const useCampaigns = () => {
     campaigns,
     isLoading,
     error,
+    getCampaign,
     createCampaign,
     updateCampaign,
     deleteCampaign,

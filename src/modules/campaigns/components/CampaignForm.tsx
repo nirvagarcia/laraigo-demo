@@ -1,6 +1,6 @@
 import { useState, useCallback, memo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Tabs, Tab, Stack } from "@mui/material";
+import { Tabs, Tab, Stack, Skeleton } from "@mui/material";
 import { Button } from "@shared/components/ui/Button";
 import { Card } from "@shared/components/ui/Card";
 import { AppBox } from "@shared/components/ui/AppBox";
@@ -11,8 +11,9 @@ import { useTranslation } from "@app/providers/I18nProvider";
 import { campaignSx } from "../styles/stylesCampaign";
 import { CampaignFormData } from "../schemas/campaignSchema";
 import { CampaignProvider, useCampaign } from "../contexts/CampaignContext";
-import { campaignService, CampaignError } from "../services/campaignService";
-import { toast } from "../utils/toast";
+import { useCampaigns } from "../contexts/CampaignsProvider";
+import { CampaignError } from "../services/campaignService";
+import { useToast } from "@shared/components/ui";
 import { goToCampaignsList } from "../utils/navigation";
 import { GeneralTab } from "./GeneralTab";
 import { PersonsTab } from "./PersonsTab";
@@ -36,15 +37,53 @@ const TabPanel = memo<TabPanelProps>(({ children, value, index }) => {
   );
 });
 
+const FormLoadingSkeleton: React.FC = () => (
+  <Card sx={{ p: 3 }}>
+    <AppBox sx={{ mb: 3 }}>
+      <Skeleton variant="text" width="30%" height={32} sx={{ mb: 1 }} />
+      <Skeleton variant="text" width="60%" height={24} sx={{ mb: 2 }} />
+    </AppBox>
+
+    <Stack spacing={3}>
+      <Skeleton variant="rounded" width="100%" height={56} />
+      <Skeleton variant="rounded" width="100%" height={120} />
+
+      <AppBox sx={{ display: "flex", gap: 2 }}>
+        <Skeleton variant="rounded" width="48%" height={56} />
+        <Skeleton variant="rounded" width="48%" height={56} />
+      </AppBox>
+
+      <AppBox sx={{ display: "flex", gap: 2 }}>
+        <Skeleton variant="rounded" width="48%" height={56} />
+        <Skeleton variant="rounded" width="48%" height={56} />
+      </AppBox>
+
+      <Skeleton variant="rounded" width="100%" height={56} />
+      <Skeleton variant="rounded" width="100%" height={56} />
+
+      <AppBox
+        sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 3 }}
+      >
+        <Skeleton variant="rounded" width={100} height={40} />
+        <Skeleton variant="rounded" width={120} height={40} />
+      </AppBox>
+    </Stack>
+  </Card>
+);
+
 const CampaignFormInner: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState(0);
+  const { saveCampaign } = useCampaigns();
+  const toast = useToast();
 
   const {
     handleSubmit,
     formState: { isSubmitting },
+    isLoadingCampaign,
+    isReady,
   } = useCampaign();
 
   const isEditing = id && id !== "new";
@@ -53,7 +92,7 @@ const CampaignFormInner: React.FC = () => {
   const onSubmit = useCallback(
     async (data: CampaignFormData) => {
       try {
-        await campaignService.save(data, isEditing ? id : undefined);
+        await saveCampaign(data, isEditing ? id : undefined);
         toast.success(
           isEditing
             ? t("messages.campaign_updated")
@@ -70,7 +109,7 @@ const CampaignFormInner: React.FC = () => {
         }
       }
     },
-    [id, isEditing, navigate, t]
+    [id, isEditing, navigate, t, saveCampaign]
   );
 
   const handleCancel = useCallback(() => {
@@ -83,6 +122,37 @@ const CampaignFormInner: React.FC = () => {
     },
     []
   );
+
+  if (isLoadingCampaign || !isReady) {
+    return (
+      <PageContainer>
+        <AppBox
+          sx={{
+            ...globalStyles.container,
+            ...campaignSx.campaignFormContainer,
+          }}
+        >
+          <AppBox sx={campaignSx.campaignFormHeader}>
+            <AppBox>
+              <AppText variant="h4" sx={campaignSx.campaignFormTitle}>
+                {pageTitle}
+              </AppText>
+            </AppBox>
+            <Stack
+              direction="row"
+              spacing={2}
+              sx={campaignSx.campaignFormActions}
+            >
+              <Skeleton variant="rounded" width={80} height={40} />
+              <Skeleton variant="rounded" width={120} height={40} />
+            </Stack>
+          </AppBox>
+
+          <FormLoadingSkeleton />
+        </AppBox>
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>
@@ -108,14 +178,14 @@ const CampaignFormInner: React.FC = () => {
             <Button
               variant="outlined"
               onClick={handleCancel}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isLoadingCampaign || !isReady}
             >
               {t("buttons.cancel")}
             </Button>
             <Button
               type="submit"
               variant="primary"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isLoadingCampaign || !isReady}
               form="campaign-form"
               sx={campaignSx.campaignFormSaveButton}
             >
@@ -126,7 +196,16 @@ const CampaignFormInner: React.FC = () => {
           </Stack>
         </AppBox>
 
-        <Card sx={campaignSx.campaignFormCard}>
+        <Card
+          sx={{
+            ...campaignSx.campaignFormCard,
+            animation: "fadeIn 0.4s ease-out",
+            "@keyframes fadeIn": {
+              "0%": { opacity: 0, transform: "translateY(10px)" },
+              "100%": { opacity: 1, transform: "translateY(0)" },
+            },
+          }}
+        >
           <form id="campaign-form" onSubmit={handleSubmit(onSubmit)}>
             <AppBox sx={campaignSx.campaignFormTabsContainer}>
               <Tabs

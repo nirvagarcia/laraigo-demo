@@ -48,6 +48,8 @@
   "fields.template": "Plantilla",
   "errors.required": "{{field}} es requerido",
   "errors.requiredDate": "{{field}} es requerida",
+  "errors.save_failed": "Error al guardar la campaña. Inténtalo de nuevo.",
+  "errors.campaign_load_failed": "Error al cargar los datos de la campaña. Actualiza y vuelve a intentar.",
   "tabs.general": "General",
   "tabs.persons": "Personas",
   "buttons.save_campaign": "Guardar Campaña",
@@ -71,6 +73,7 @@
   "campaign.form.description.edit": "Actualiza los detalles de tu campaña",
   "campaign.form.description.create": "Configura los detalles de tu nueva campaña",
   "campaign.form.saving": "Guardando...",
+  "campaign.form.loading": "Cargando campaña...",
   "placeholders.title": "Ingresa el título de la campaña",
   "placeholders.description": "Proporciona una breve descripción",
   "placeholders.startDate": "Selecciona fecha de inicio",
@@ -96,5 +99,7 @@
   "common.coming_soon_description": "Estamos trabajando en esta sección. Vuelve pronto para ver las novedades.",
   "common.back_to_home": "Volver al inicio",
   "campaign.loading": "Cargando campañas...",
-  "campaign.error": "Error al cargar campañas"
+  "campaign.error": "Error al cargar campañas",
+  "messages.campaign_created": "¡Campaña creada exitosamente!",
+  "messages.campaign_updated": "¡Campaña actualizada exitosamente!"
 }

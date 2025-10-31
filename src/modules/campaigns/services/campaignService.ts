@@ -6,6 +6,7 @@ export interface CampaignService {
   save: (data: CampaignFormData, id?: string) => Promise<Campaign>;
   create: (data: CampaignFormData) => Promise<Campaign>;
   update: (id: string, data: CampaignFormData) => Promise<Campaign>;
+  get: (id: string) => Promise<Campaign>;
 }
 
 const mapFormDataToCampaign = (
@@ -58,6 +59,31 @@ class MockCampaignService implements CampaignService {
     };
 
     return updatedCampaign;
+  }
+
+  async get(id: string): Promise<Campaign> {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const mockCampaign: Campaign = {
+      id,
+      title: `Sample Campaign ${id}`,
+      description: `This is a sample description for campaign ${id}`,
+      startDate: new Date(),
+      endDate: new Date(Date.now() + 86400000 * 7),
+      source: "web",
+      executionType: "immediate",
+      scheduledDate: undefined,
+      scheduledTime: undefined,
+      group: "marketing",
+      channel: "email",
+      messageType: "promotional",
+      template: "default",
+      status: Math.random() > 0.5 ? "active" : "draft",
+      createdAt: new Date(Date.now() - 86400000 * 2),
+      updatedAt: new Date(Date.now() - 86400000),
+    };
+
+    return mockCampaign;
   }
 }
 

@@ -4,15 +4,23 @@ import {
   ReactNode,
   useMemo,
   useCallback,
+  useEffect,
+  useState,
 } from "react";
 import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useParams } from "react-router-dom";
 import { useTranslation } from "@app/providers/I18nProvider";
 import { campaignSchema, CampaignFormData } from "../schemas/campaignSchema";
 import { getDefaultCampaignValues } from "../utils/formDefaults";
+import { useToast } from "@shared/components/ui";
+import { bootstrapService, BootstrapData } from "../services/bootstrapService";
 
 interface CampaignContextType extends UseFormReturn<CampaignFormData> {
   updateField: (field: keyof CampaignFormData, value: any) => void;
+  isLoadingCampaign: boolean;
+  isReady: boolean;
+  bootstrapData: BootstrapData | null;
 }
 
 const CampaignContext = createContext<CampaignContextType | null>(null);
@@ -27,6 +35,13 @@ export const CampaignProvider: React.FC<CampaignProviderProps> = ({
   initialValues,
 }) => {
   const { t } = useTranslation();
+  const { id } = useParams<{ id: string }>();
+  const [isLoadingCampaign, setIsLoadingCampaign] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+  const [bootstrapData, setBootstrapData] = useState<BootstrapData | null>(
+    null
+  );
+  const toast = useToast();
 
   const resolver = useMemo(() => zodResolver(campaignSchema(t)), [t]);
 
@@ -45,16 +60,61 @@ export const CampaignProvider: React.FC<CampaignProviderProps> = ({
     reValidateMode: "onChange",
   });
 
+  const { setValue, reset } = methods;
+
+  useEffect(() => {
+    const loadBootstrapData = async () => {
+      try {
+        setIsLoadingCampaign(true);
+        setIsReady(false);
+
+        const campaignId = id && id !== "new" ? id : undefined;
+        const data = await bootstrapService.getBootstrap(campaignId);
+
+        setBootstrapData(data);
+
+        if (data.campaign) {
+          reset({
+            title: data.campaign.title,
+            description: data.campaign.description,
+            startDate: data.campaign.startDate,
+            endDate: data.campaign.endDate,
+            source: data.campaign.source,
+            executionType: data.campaign.executionType,
+            scheduledDate: data.campaign.scheduledDate,
+            scheduledTime: data.campaign.scheduledTime,
+            group: data.campaign.group,
+            channel: data.campaign.channel,
+            messageType: data.campaign.messageType,
+            template: data.campaign.template,
+          });
+        }
+
+        setIsReady(true);
+      } catch (error) {
+        console.error("Error loading bootstrap data:", error);
+        toast.error(t("errors.campaign_load_failed"));
+      } finally {
+        setIsLoadingCampaign(false);
+      }
+    };
+
+    loadBootstrapData();
+  }, [id, reset, t, toast]);
+
   const updateField = useCallback(
     (field: keyof CampaignFormData, value: any) => {
-      methods.setValue(field, value, { shouldValidate: true });
+      setValue(field, value, { shouldValidate: true });
     },
-    [methods.setValue]
+    [setValue]
   );
 
   const contextValue: CampaignContextType = {
     ...methods,
     updateField,
+    isLoadingCampaign,
+    isReady,
+    bootstrapData,
   };
 
   return (

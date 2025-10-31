@@ -48,6 +48,8 @@
   "fields.template": "Template",
   "errors.required": "{{field}} is required",
   "errors.requiredDate": "{{field}} is required",
+  "errors.save_failed": "Failed to save campaign. Please try again.",
+  "errors.campaign_load_failed": "Failed to load campaign data. Please refresh and try again.",
   "tabs.general": "General",
   "tabs.persons": "Persons",
   "buttons.save_campaign": "Save Campaign",
@@ -71,6 +73,7 @@
   "campaign.form.description.edit": "Update your campaign details",
   "campaign.form.description.create": "Configure the details of your new campaign",
   "campaign.form.saving": "Saving...",
+  "campaign.form.loading": "Loading campaign...",
   "placeholders.title": "Enter the campaign title",
   "placeholders.description": "Provide a brief description",
   "placeholders.startDate": "Select start date",
@@ -96,5 +99,7 @@
   "common.coming_soon_description": "We are working on this section. Come back soon to see what's new.",
   "common.back_to_home": "Back to Home",
   "campaign.loading": "Loading campaigns...",
-  "campaign.error": "Error loading campaigns"
+  "campaign.error": "Error loading campaigns",
+  "messages.campaign_created": "Campaign created successfully!",
+  "messages.campaign_updated": "Campaign updated successfully!"
 }

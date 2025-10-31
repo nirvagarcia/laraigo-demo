@@ -1,11 +1,14 @@
 import { ThemeProvider, I18nProvider } from "@app/providers";
+import { ToastProvider } from "@shared/components/ui";
 import { AppRoutes } from "@app/routes/AppRoutes";
 
 export const App: React.FC = () => {
   return (
     <ThemeProvider>
       <I18nProvider>
-        <AppRoutes />
+        <ToastProvider>
+          <AppRoutes />
+        </ToastProvider>
       </I18nProvider>
     </ThemeProvider>
   );
