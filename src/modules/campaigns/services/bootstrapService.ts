@@ -1,6 +1,7 @@
 import { API_BASE_URL } from "@app/config/api";
 import { Campaign } from "../types/campaign";
 import { SelectOption } from "../types/selectOption";
+import { logger } from "@shared/utils/logger";
 
 export interface BootstrapData {
   sources: SelectOption[];
@@ -82,7 +83,7 @@ export const bootstrapService = {
         campaign: campaign ? parseDates(campaign) : null,
       };
     } catch (error) {
-      console.error("Bootstrap service error:", error);
+      logger.error("Bootstrap service failed", error, "bootstrapService");
       throw new Error(
         error instanceof Error
           ? `Bootstrap failed: ${error.message}`

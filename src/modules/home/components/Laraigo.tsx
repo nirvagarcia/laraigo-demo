@@ -7,7 +7,7 @@ import { GradientButton } from "@shared/components/ui/GradientButton";
 import { FeatureGrid } from "@shared/components/ui/FeatureGrid";
 import { useTranslation } from "@app/providers/I18nProvider";
 import { layouts } from "@shared/styles/layouts";
-import { laraigoSx } from "../styles/stylesLaraigo";
+import { laraigoSx } from "../styles/laraigo-styles";
 
 export const Laraigo: React.FC = () => {
   const navigate = useNavigate();

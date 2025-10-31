@@ -8,13 +8,14 @@ import { AppText } from "@shared/components/ui/AppText";
 import { PageContainer } from "@shared/components/layout/PageContainer";
 import { globalStyles } from "@shared/styles/globals";
 import { useTranslation } from "@app/providers/I18nProvider";
-import { campaignSx } from "../styles/stylesCampaign";
+import { campaignSx } from "../styles/campaign-styles";
 import { CampaignFormData } from "../schemas/campaignSchema";
 import { CampaignProvider, useCampaign } from "../contexts/CampaignContext";
 import { useCampaigns } from "../contexts/CampaignsProvider";
 import { CampaignError } from "../services/campaignService";
 import { useToast } from "@shared/components/ui";
 import { goToCampaignsList } from "../utils/navigation";
+import { logger } from "@shared/utils/logger";
 import { GeneralTab } from "./GeneralTab";
 import { PersonsTab } from "./PersonsTab";
 
@@ -37,7 +38,7 @@ const TabPanel = memo<TabPanelProps>(({ children, value, index }) => {
   );
 });
 
-const FormLoadingSkeleton: React.FC = () => (
+const FormLoadingSkeleton: React.FC = memo(() => (
   <Card sx={{ p: 3 }}>
     <AppBox sx={{ mb: 3 }}>
       <Skeleton variant="text" width="30%" height={32} sx={{ mb: 1 }} />
@@ -69,7 +70,7 @@ const FormLoadingSkeleton: React.FC = () => (
       </AppBox>
     </Stack>
   </Card>
-);
+));
 
 const CampaignFormInner: React.FC = () => {
   const { t } = useTranslation();
@@ -100,7 +101,7 @@ const CampaignFormInner: React.FC = () => {
         );
         goToCampaignsList(navigate);
       } catch (error) {
-        console.error("Error saving campaign:", error);
+        logger.error("Failed to save campaign", error, "CampaignForm");
 
         if (error instanceof CampaignError) {
           toast.error(error.message);
@@ -196,16 +197,7 @@ const CampaignFormInner: React.FC = () => {
           </Stack>
         </AppBox>
 
-        <Card
-          sx={{
-            ...campaignSx.campaignFormCard,
-            animation: "fadeIn 0.4s ease-out",
-            "@keyframes fadeIn": {
-              "0%": { opacity: 0, transform: "translateY(10px)" },
-              "100%": { opacity: 1, transform: "translateY(0)" },
-            },
-          }}
-        >
+        <Card sx={campaignSx.campaignFormCard}>
           <form id="campaign-form" onSubmit={handleSubmit(onSubmit)}>
             <AppBox sx={campaignSx.campaignFormTabsContainer}>
               <Tabs

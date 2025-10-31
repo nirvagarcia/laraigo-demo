@@ -15,6 +15,7 @@ import { campaignSchema, CampaignFormData } from "../schemas/campaignSchema";
 import { getDefaultCampaignValues } from "../utils/formDefaults";
 import { useToast } from "@shared/components/ui";
 import { bootstrapService, BootstrapData } from "../services/bootstrapService";
+import { logger } from "@shared/utils/logger";
 
 interface CampaignContextType extends UseFormReturn<CampaignFormData> {
   updateField: (field: keyof CampaignFormData, value: any) => void;
@@ -92,7 +93,7 @@ export const CampaignProvider: React.FC<CampaignProviderProps> = ({
 
         setIsReady(true);
       } catch (error) {
-        console.error("Error loading bootstrap data:", error);
+        logger.error("Failed to load bootstrap data", error, "CampaignContext");
         toast.error(t("errors.campaign_load_failed"));
       } finally {
         setIsLoadingCampaign(false);

@@ -5,7 +5,7 @@ import { AppText } from "@shared/components/ui/AppText";
 import { AppBox } from "@shared/components/ui/AppBox";
 import { PageContainer } from "@shared/components/layout/PageContainer";
 import { useTranslation } from "@app/providers/I18nProvider";
-import { comingSoonSx } from "../styles/stylesCommon";
+import { comingSoonSx } from "../styles/common-styles";
 
 interface ComingSoonProps {
   titleKey?: string;

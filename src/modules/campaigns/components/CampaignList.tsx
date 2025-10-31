@@ -12,7 +12,8 @@ import { StatusBadge } from "@shared/components/ui/StatusBadge";
 import { PageContainer } from "@shared/components/layout/PageContainer";
 import { globalStyles } from "@shared/styles/globals";
 import { useTranslation } from "@app/providers/I18nProvider";
-import { campaignSx } from "../styles/stylesCampaign";
+import { logger } from "@shared/utils/logger";
+import { campaignSx } from "../styles/campaign-styles";
 import { useCampaigns } from "../contexts/CampaignsProvider";
 import { useCampaignStatus } from "../hooks";
 import { goToNewCampaign, goToEditCampaign } from "../utils/navigation";
@@ -40,7 +41,7 @@ export const CampaignList: React.FC = () => {
       try {
         await deleteCampaign(id);
       } catch (error) {
-        console.error("Failed to delete campaign:", error);
+        logger.error("Failed to delete campaign", error, "CampaignList");
       }
     },
     [deleteCampaign]

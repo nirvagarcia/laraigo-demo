@@ -1,6 +1,6 @@
 import { styled } from "@mui/material/styles";
 import { Box, Paper } from "@mui/material";
-import { colors } from "../../../shared/styles/colors";
+import { colors } from "@shared/styles";
 
 export const CampaignContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(4),

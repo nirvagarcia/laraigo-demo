@@ -4,6 +4,7 @@ import { Campaign } from "../types/campaign";
 import { campaignApiService } from "../data/campaignApiService";
 import { campaignService } from "../services/campaignService";
 import { CampaignFormData } from "../schemas/campaignSchema";
+import { logger } from "@shared/utils/logger";
 
 export const useCampaigns = () => {
   const { t } = useTranslation();
@@ -34,7 +35,7 @@ export const useCampaigns = () => {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to load campaigns";
         setError(errorMessage);
-        console.error("Error loading campaigns:", err);
+        logger.error("Failed to load campaigns", err, "useCampaigns");
       } finally {
         setIsLoading(false);
       }
@@ -112,9 +113,10 @@ export const useCampaigns = () => {
         const apiCampaigns = await campaignApiService.getAll();
         setCampaigns(apiCampaigns);
       } catch (refetchErr) {
-        console.error(
-          "Failed to restore campaigns after delete error:",
-          refetchErr
+        logger.error(
+          "Failed to restore campaigns after delete error",
+          refetchErr,
+          "useCampaigns"
         );
       }
 

@@ -2,7 +2,7 @@ import { AppBox } from "@shared/components/ui/AppBox";
 import { AppText } from "@shared/components/ui/AppText";
 import { CardPlaceholder } from "@shared/components/ui/CardPlaceholder";
 import { useTranslation } from "@app/providers/I18nProvider";
-import { campaignSx } from "../styles/stylesCampaign";
+import { campaignSx } from "../styles/campaign-styles";
 
 export const PersonsTab: React.FC = () => {
   const { t } = useTranslation();
