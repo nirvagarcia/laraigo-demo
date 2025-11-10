@@ -171,7 +171,6 @@ export const Sidebar: React.FC = () => {
         </AppBox>
       </AppBox>
 
-      {/* User Section with Logout */}
       {user && (
         <AppBox
           direction="column"

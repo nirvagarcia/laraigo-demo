@@ -7,6 +7,13 @@ import axios, {
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
+const AUTH_WHITELIST = [
+  "/auth/login",
+  "/auth/register",
+  "/auth/refresh",
+  "/auth/verify",
+];
+
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: parseInt(import.meta.env.VITE_API_TIMEOUT || "10000"),
@@ -30,10 +37,24 @@ apiClient.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
+      const requestUrl = error.config?.url || "";
+      const isAuthEndpoint = AUTH_WHITELIST.some((path) =>
+        requestUrl.includes(path)
+      );
+
+      if (isAuthEndpoint) {
+        return Promise.reject(error);
+      }
+
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
-      window.location.href = "/login";
+
+      if (typeof window !== "undefined") {
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 100);
+      }
     }
     return Promise.reject(error);
   }

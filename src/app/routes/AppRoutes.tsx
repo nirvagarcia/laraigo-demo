@@ -18,7 +18,6 @@ export const AppRoutes: React.FC = () => {
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
         <Route
           path="/login"
           element={
@@ -36,10 +35,8 @@ export const AppRoutes: React.FC = () => {
           }
         />
 
-        {/* Landing Page - Public */}
         <Route path="/" element={<Laraigo />} />
 
-        {/* Protected Routes */}
         <Route
           path="/dashboard"
           element={
@@ -112,7 +109,6 @@ export const AppRoutes: React.FC = () => {
           }
         />
 
-        {/* Catch all route - redirect to dashboard if authenticated, login if not */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

@@ -8,10 +8,8 @@ import {
   InputAdornment,
   CircularProgress,
   Link as MuiLink,
-  LinearProgress,
 } from "@mui/material";
 import { Visibility, VisibilityOff, Email, Lock } from "@mui/icons-material";
-import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, Link } from "react-router-dom";
@@ -45,6 +43,12 @@ export const LoginPage: React.FC = () => {
     },
   });
 
+  const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    handleSubmit(onSubmit)(event);
+  };
+
   const onSubmit = async (data: LoginFormData) => {
     if (isLoading) return;
 
@@ -60,12 +64,12 @@ export const LoginPage: React.FC = () => {
 
       setTimeout(() => {
         navigate("/dashboard");
-      }, 1200);
+      }, 800);
     } catch (err: any) {
       setHasError(true);
       setValue("password", "");
 
-      let errorMessage = t("auth.login.error.general");
+      let errorMessage = "Invalid email or password. Please try again.";
 
       if (err.message === "INVALID_CREDENTIALS") {
         errorMessage = t("auth.login.error.invalid");
@@ -88,11 +92,22 @@ export const LoginPage: React.FC = () => {
 
   return (
     <Box
-      component={motion.div}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+      sx={{
+        opacity: 1,
+        transform: "translateX(0)",
+        transition: "all 0.35s cubic-bezier(0.25, 0.1, 0.25, 1)",
+        animation: "fadeInSlide 0.35s cubic-bezier(0.25, 0.1, 0.25, 1)",
+        "@keyframes fadeInSlide": {
+          "0%": {
+            opacity: 0,
+            transform: "translateX(-20px)",
+          },
+          "100%": {
+            opacity: 1,
+            transform: "translateX(0)",
+          },
+        },
+      }}
     >
       <Box
         sx={{
@@ -106,18 +121,7 @@ export const LoginPage: React.FC = () => {
           p: 2,
         }}
       >
-        {/* Background elements */}
         <Box
-          component={motion.div}
-          animate={{
-            x: [0, 20, 0],
-            y: [0, -10, 0],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
           sx={{
             position: "absolute",
             top: -100,
@@ -130,16 +134,6 @@ export const LoginPage: React.FC = () => {
           }}
         />
         <Box
-          component={motion.div}
-          animate={{
-            x: [0, -15, 0],
-            y: [0, 15, 0],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
           sx={{
             position: "absolute",
             bottom: -150,
@@ -153,18 +147,6 @@ export const LoginPage: React.FC = () => {
         />
 
         <Box
-          component={motion.div}
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{
-            scale: isSuccess ? 0.95 : 1,
-            opacity: isSuccess ? 0.7 : 1,
-            y: hasError ? [-5, 5, -5, 5, 0] : 0,
-          }}
-          transition={{
-            scale: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] },
-            opacity: { duration: 0.4 },
-            y: { duration: 0.5, ease: "easeOut" },
-          }}
           sx={{
             background: "rgba(255, 255, 255, 0.95)",
             backdropFilter: "blur(20px)",
@@ -176,35 +158,42 @@ export const LoginPage: React.FC = () => {
             maxWidth: { xs: "90%", sm: 480 },
             position: "relative",
             zIndex: 1,
-            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+            transition: "all 0.35s cubic-bezier(0.25, 0.1, 0.25, 1)",
+            transform: hasError ? "translateX(-2px)" : "translateX(0)",
+            opacity: isSuccess ? 0.8 : 1,
             ...(isLoading
               ? {}
               : {
                   "&:hover": {
-                    transform: "translateY(-2px)",
+                    transform: hasError
+                      ? "translateX(-2px)"
+                      : "translateY(-2px)",
                     boxShadow: "0 24px 48px rgba(0, 0, 0, 0.12)",
                   },
                 }),
             "@media (hover: none) and (pointer: coarse)": {
               "&:hover": {
-                transform: "none",
+                transform: hasError ? "translateX(-2px)" : "translateX(0)",
                 boxShadow: "0 20px 40px rgba(0, 0, 0, 0.1)",
               },
             },
           }}
         >
-          {/* Loading Progress Bar */}
           {isLoading && (
-            <LinearProgress
+            <Box
               sx={{
                 position: "absolute",
                 top: 0,
                 left: 0,
                 right: 0,
+                height: 3,
                 borderRadius: "16px 16px 0 0",
-                backgroundColor: "rgba(99, 102, 241, 0.1)",
-                "& .MuiLinearProgress-bar": {
-                  backgroundColor: colors.primary[500],
+                background:
+                  "linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.8), transparent)",
+                animation: "loading 1.5s ease-in-out infinite",
+                "@keyframes loading": {
+                  "0%": { transform: "translateX(-100%)" },
+                  "100%": { transform: "translateX(100%)" },
                 },
               }}
             />
@@ -244,13 +233,13 @@ export const LoginPage: React.FC = () => {
             </Typography>
           </Box>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleFormSubmit} noValidate>
             <Stack spacing={{ xs: 2.5, sm: 3 }}>
               <TextField
                 fullWidth
                 label={t("fields.email")}
                 type="email"
-                autoComplete="email"
+                autoComplete="username"
                 {...register("email")}
                 error={!!errors.email}
                 helperText={errors.email?.message}

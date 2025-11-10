@@ -28,43 +28,48 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    initializeAuth();
-  }, []);
+    let mounted = true;
 
-  const initializeAuth = async () => {
-    try {
-      setIsLoading(true);
+    const initializeAuth = async () => {
+      try {
+        setIsLoading(true);
 
-      if (AuthService.isAuthenticated()) {
-        const storedUser = AuthService.getCurrentUser();
+        if (AuthService.isAuthenticated()) {
+          const storedUser = AuthService.getCurrentUser();
 
-        if (storedUser) {
-          try {
-            const verifiedUser = await AuthService.verify();
-            setUser(verifiedUser);
-          } catch (error) {
-            await AuthService.logout();
-            setUser(null);
+          if (storedUser && mounted) {
+            try {
+              const verifiedUser = await AuthService.verify();
+              if (mounted) setUser(verifiedUser);
+            } catch (error) {
+              if (mounted) {
+                await AuthService.logout();
+                setUser(null);
+              }
+            }
           }
         }
+      } catch (error) {
+        console.error("Auth initialization error:", error);
+        if (mounted) setUser(null);
+      } finally {
+        if (mounted) setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Auth initialization error:", error);
-      setUser(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
+
+    initializeAuth();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const login = async (email: string, password: string): Promise<void> => {
     try {
-      setIsLoading(true);
       const user = await AuthService.login({ email, password });
       setUser(user);
     } catch (error: any) {
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -74,13 +79,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     password: string
   ): Promise<void> => {
     try {
-      setIsLoading(true);
       const user = await AuthService.register({ name, email, password });
       setUser(user);
     } catch (error: any) {
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
