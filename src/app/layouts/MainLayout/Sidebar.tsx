@@ -3,7 +3,6 @@ import { LogoutOutlined } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AppBox } from "@shared/components/ui/AppBox";
 import { AppText } from "@shared/components/ui/AppText";
-import { useToast } from "@shared/components/ui";
 import { useTranslation } from "@app/providers/I18nProvider";
 import { useAuth } from "@app/providers/AuthProvider";
 import { colors } from "@shared/styles/colors";
@@ -19,7 +18,6 @@ export const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user, logout } = useAuth();
-  const toast = useToast();
   const theme = useTheme();
 
   const navItems: NavItem[] = [
@@ -52,12 +50,10 @@ export const Sidebar: React.FC = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      toast.success(t("auth.logout.success"), 4000);
-      navigate("/login");
+      navigate("/login", { replace: true });
     } catch (error) {
-      console.error("Logout error:", error);
-      toast.error(t("auth.logout.error"), 5000);
-      navigate("/login");
+      await logout();
+      navigate("/login", { replace: true });
     }
   };
 

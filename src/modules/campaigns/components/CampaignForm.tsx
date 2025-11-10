@@ -12,7 +12,6 @@ import { campaignSx } from "../styles/campaign-styles";
 import { CampaignFormData } from "../schemas/campaignSchema";
 import { CampaignProvider, useCampaign } from "../contexts/CampaignContext";
 import { useCampaigns } from "../contexts/CampaignsProvider";
-import { CampaignError } from "../services/campaignService";
 import { useToast } from "@shared/components/ui";
 import { goToCampaignsList } from "../utils/navigation";
 import { logger } from "@shared/utils/logger";
@@ -77,15 +76,19 @@ const CampaignFormInner: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState(0);
-  const { saveCampaign } = useCampaigns();
+  const { createCampaign, updateCampaign } = useCampaigns();
   const toast = useToast();
 
   const {
     handleSubmit,
-    formState: { isSubmitting },
+    watch,
+    formState: { isSubmitting, isValid },
     isLoadingCampaign,
     isReady,
   } = useCampaign();
+
+  const source = watch("source");
+  const filePath = watch("filePath");
 
   const isEditing = id && id !== "new";
   const pageTitle = isEditing ? t("campaign.edit") : t("campaign.create");
@@ -93,7 +96,11 @@ const CampaignFormInner: React.FC = () => {
   const onSubmit = useCallback(
     async (data: CampaignFormData) => {
       try {
-        await saveCampaign(data, isEditing ? id : undefined);
+        if (isEditing) {
+          await updateCampaign(Number(id), data);
+        } else {
+          await createCampaign(data);
+        }
         toast.success(
           isEditing
             ? t("messages.campaign_updated")
@@ -102,15 +109,10 @@ const CampaignFormInner: React.FC = () => {
         goToCampaignsList(navigate);
       } catch (error) {
         logger.error("Failed to save campaign", error, "CampaignForm");
-
-        if (error instanceof CampaignError) {
-          toast.error(error.message);
-        } else {
-          toast.error(t("errors.save_failed"));
-        }
+        toast.error(t("errors.save_failed"));
       }
     },
-    [id, isEditing, navigate, t, saveCampaign]
+    [id, isEditing, navigate, t, createCampaign, updateCampaign]
   );
 
   const handleCancel = useCallback(() => {
@@ -186,7 +188,13 @@ const CampaignFormInner: React.FC = () => {
             <Button
               type="submit"
               variant="primary"
-              disabled={isSubmitting || isLoadingCampaign || !isReady}
+              disabled={
+                !isValid ||
+                isSubmitting ||
+                isLoadingCampaign ||
+                !isReady ||
+                (source === "EXTERNA" && !filePath)
+              }
               form="campaign-form"
               sx={campaignSx.campaignFormSaveButton}
             >
@@ -206,12 +214,12 @@ const CampaignFormInner: React.FC = () => {
                 sx={campaignSx.campaignFormTabs}
               >
                 <Tab
-                  label={`📋 ${t("tabs.general")}`}
+                  label={`📋 ${t("campaigns.tabs.general")}`}
                   id="campaign-tab-0"
                   aria-controls="campaign-tabpanel-0"
                 />
                 <Tab
-                  label={`👥 ${t("tabs.persons")}`}
+                  label={`👥 ${t("campaigns.tabs.persons")}`}
                   id="campaign-tab-1"
                   aria-controls="campaign-tabpanel-1"
                 />

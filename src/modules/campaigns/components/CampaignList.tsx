@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Skeleton, Stack } from "@mui/material";
 import { EditIcon, DeleteIcon } from "@shared/components/icons";
@@ -10,41 +10,68 @@ import { AppIconButton } from "@shared/components/ui/AppIconButton";
 import { ErrorState } from "@shared/components/ui/ErrorState";
 import { StatusBadge } from "@shared/components/ui/StatusBadge";
 import { PageContainer } from "@shared/components/layout/PageContainer";
+import { useToast } from "@shared/components/ui/ToastProvider";
 import { globalStyles } from "@shared/styles/globals";
 import { useTranslation } from "@app/providers/I18nProvider";
+import { useAuth } from "@app/providers/AuthProvider";
 import { logger } from "@shared/utils/logger";
 import { campaignSx } from "../styles/campaign-styles";
 import { useCampaigns } from "../contexts/CampaignsProvider";
 import { useCampaignStatus } from "../hooks";
 import { goToNewCampaign, goToEditCampaign } from "../utils/navigation";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 export const CampaignList: React.FC = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const toast = useToast();
   const { campaigns, isLoading, error, deleteCampaign, refresh } =
     useCampaigns();
   const { getStatusLabel } = useCampaignStatus();
+
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [campaignToDelete, setCampaignToDelete] = useState<number | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const isAdmin = user?.role === "ADMIN";
 
   const handleCreateCampaign = useCallback(() => {
     goToNewCampaign(navigate);
   }, [navigate]);
 
+  const handleDeleteCampaign = useCallback((id: number) => {
+    setCampaignToDelete(id);
+    setConfirmDialogOpen(true);
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!campaignToDelete) return;
+
+    setDeleteLoading(true);
+    try {
+      await deleteCampaign(campaignToDelete);
+      toast.success("Campaña eliminada correctamente.");
+    } catch (error) {
+      logger.error("Failed to delete campaign", error, "CampaignList");
+      toast.error("No se pudo eliminar la campaña. Intenta de nuevo.");
+    } finally {
+      setDeleteLoading(false);
+      setConfirmDialogOpen(false);
+      setCampaignToDelete(null);
+    }
+  }, [campaignToDelete, deleteCampaign, toast]);
+
+  const handleCancelDelete = useCallback(() => {
+    setConfirmDialogOpen(false);
+    setCampaignToDelete(null);
+  }, []);
+
   const handleEditCampaign = useCallback(
-    (id: string) => {
-      goToEditCampaign(navigate, id);
+    (id: number) => {
+      goToEditCampaign(navigate, id.toString());
     },
     [navigate]
-  );
-
-  const handleDeleteCampaign = useCallback(
-    async (id: string) => {
-      try {
-        await deleteCampaign(id);
-      } catch (error) {
-        logger.error("Failed to delete campaign", error, "CampaignList");
-      }
-    },
-    [deleteCampaign]
   );
 
   const renderSkeletonCard = () => (
@@ -183,13 +210,15 @@ export const CampaignList: React.FC = () => {
               {t("campaign.manage_description")}
             </AppText>
           </AppBox>
-          <Button
-            variant="primary"
-            onClick={handleCreateCampaign}
-            sx={campaignSx.createButton}
-          >
-            ➕ {t("buttons.create_campaign")}
-          </Button>
+          {isAdmin && (
+            <Button
+              variant="primary"
+              onClick={handleCreateCampaign}
+              sx={campaignSx.createButton}
+            >
+              ➕ {t("buttons.create_campaign")}
+            </Button>
+          )}
         </AppBox>
 
         <AppBox sx={campaignSx.campaignGrid}>
@@ -205,20 +234,24 @@ export const CampaignList: React.FC = () => {
               }}
             >
               <AppBox sx={campaignSx.cardActions}>
-                <AppIconButton
-                  size="small"
-                  onClick={() => handleEditCampaign(campaign.id)}
-                  sx={campaignSx.glassIconButton}
-                >
-                  <EditIcon fontSize="small" />
-                </AppIconButton>
-                <AppIconButton
-                  size="small"
-                  onClick={() => handleDeleteCampaign(campaign.id)}
-                  sx={campaignSx.glassIconButton}
-                >
-                  <DeleteIcon fontSize="small" />
-                </AppIconButton>
+                {isAdmin && (
+                  <>
+                    <AppIconButton
+                      size="small"
+                      onClick={() => handleEditCampaign(Number(campaign.id))}
+                      sx={campaignSx.glassIconButton}
+                    >
+                      <EditIcon fontSize="small" />
+                    </AppIconButton>
+                    <AppIconButton
+                      size="small"
+                      onClick={() => handleDeleteCampaign(Number(campaign.id))}
+                      sx={campaignSx.glassIconButton}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </AppIconButton>
+                  </>
+                )}
               </AppBox>
 
               <AppText variant="h6" sx={{ ...campaignSx.cardTitle, mb: 2 }}>
@@ -233,14 +266,31 @@ export const CampaignList: React.FC = () => {
 
               <AppBox sx={{ mb: 2 }}>
                 <StatusBadge
-                  status={campaign.status as "active" | "draft" | "paused"}
-                  label={getStatusLabel(campaign.status)}
+                  status={
+                    (campaign.status || "draft").toLowerCase() as
+                      | "active"
+                      | "draft"
+                      | "paused"
+                  }
+                  label={getStatusLabel(campaign.status || "draft")}
                 />
               </AppBox>
             </Card>
           ))}
         </AppBox>
       </AppBox>
+
+      <ConfirmDialog
+        open={confirmDialogOpen}
+        title="Eliminar campaña"
+        message="¿Seguro que deseas eliminar esta campaña? Esta acción no se puede deshacer."
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        loading={deleteLoading}
+        destructive={true}
+      />
     </PageContainer>
   );
 };

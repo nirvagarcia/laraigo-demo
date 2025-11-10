@@ -1,17 +1,15 @@
 import React, { createContext, useContext, ReactNode } from "react";
-import { Campaign } from "../types/campaign";
-import { CampaignFormData } from "../schemas/campaignSchema";
+import { Campaign, CampaignFormData } from "../types/campaign";
 import { useCampaigns as useBaseCampaigns } from "../hooks/useCampaigns";
 
 interface CampaignsContextType {
   campaigns: Campaign[];
   isLoading: boolean;
   error: string | null;
-  getCampaign: (id: string) => Promise<Campaign>;
+  getCampaign: (id: number) => Promise<Campaign>;
   createCampaign: (data: CampaignFormData) => Promise<Campaign>;
-  updateCampaign: (id: string, data: CampaignFormData) => Promise<Campaign>;
-  deleteCampaign: (id: string) => Promise<void>;
-  saveCampaign: (data: CampaignFormData, id?: string) => Promise<Campaign>;
+  updateCampaign: (id: number, data: CampaignFormData) => Promise<Campaign>;
+  deleteCampaign: (id: number) => Promise<void>;
   refresh: () => Promise<void>;
 }
 

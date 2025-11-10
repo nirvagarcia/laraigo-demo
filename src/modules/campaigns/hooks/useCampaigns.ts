@@ -1,10 +1,37 @@
 import { useState, useCallback, useEffect } from "react";
 import { useTranslation } from "@app/providers/I18nProvider";
-import { Campaign } from "../types/campaign";
-import { campaignApiService } from "../data/campaignApiService";
-import { campaignService } from "../services/campaignService";
-import { CampaignFormData } from "../schemas/campaignSchema";
+import { Campaign, CampaignFormData } from "../types/campaign";
+import {
+  getCampaigns,
+  getCampaignById,
+  createCampaign,
+  updateCampaign,
+  deleteCampaign,
+} from "../data/campaignApiService";
 import { logger } from "@shared/utils/logger";
+
+import { AxiosError } from "axios";
+
+const getErrorMessage = (error: any): string => {
+  if (error instanceof Error) {
+    if ("response" in error && error.response) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      switch (axiosError.response?.status) {
+        case 403:
+          return "You don't have permission to perform this action.";
+        case 404:
+          return "Campaign not found.";
+        case 422:
+        case 400:
+          return axiosError.response?.data?.message || "Invalid data provided.";
+        default:
+          return axiosError.message;
+      }
+    }
+    return error.message;
+  }
+  return "An unexpected error occurred.";
+};
 
 export const useCampaigns = () => {
   const { t } = useTranslation();
@@ -18,24 +45,19 @@ export const useCampaigns = () => {
       try {
         setIsLoading(true);
         setError(null);
-        const apiCampaigns = await campaignApiService.getAll();
+        const apiCampaigns = await getCampaigns();
 
-        const translatedCampaigns = apiCampaigns.map((campaign) => ({
-          ...campaign,
-          title: campaign.title.startsWith("sample.")
-            ? t(campaign.title)
-            : campaign.title,
-          description: campaign.description.startsWith("sample.")
-            ? t(campaign.description)
-            : campaign.description,
-        }));
-
-        setCampaigns(translatedCampaigns);
+        if (Array.isArray(apiCampaigns)) {
+          setCampaigns(apiCampaigns);
+        } else {
+          setCampaigns([]);
+          setError("Invalid response format from server");
+        }
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to load campaigns";
+        const errorMessage = getErrorMessage(err);
         setError(errorMessage);
         logger.error("Failed to load campaigns", err, "useCampaigns");
+        setCampaigns([]);
       } finally {
         setIsLoading(false);
       }
@@ -43,21 +65,17 @@ export const useCampaigns = () => {
 
     loadCampaigns();
   }, [t]);
-
-  const createCampaign = useCallback(
+  const createCampaignAction = useCallback(
     async (data: CampaignFormData): Promise<Campaign> => {
       setIsLoading(true);
       setError(null);
 
       try {
-        const formCampaign = await campaignService.create(data);
-        const newCampaign = await campaignApiService.create(formCampaign);
-
+        const newCampaign = await createCampaign(data);
         setCampaigns((prev) => [...prev, newCampaign]);
         return newCampaign;
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to create campaign";
+        const errorMessage = getErrorMessage(err);
         setError(errorMessage);
         throw err;
       } finally {
@@ -67,18 +85,13 @@ export const useCampaigns = () => {
     []
   );
 
-  const updateCampaign = useCallback(
-    async (id: string, data: CampaignFormData): Promise<Campaign> => {
+  const updateCampaignAction = useCallback(
+    async (id: number, data: CampaignFormData): Promise<Campaign> => {
       setIsLoading(true);
       setError(null);
 
       try {
-        const formCampaign = await campaignService.update(id, data);
-        const updatedCampaign = await campaignApiService.update(
-          id,
-          formCampaign
-        );
-
+        const updatedCampaign = await updateCampaign(id, data);
         setCampaigns((prev) =>
           prev.map((campaign) =>
             campaign.id === id ? updatedCampaign : campaign
@@ -86,8 +99,7 @@ export const useCampaigns = () => {
         );
         return updatedCampaign;
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to update campaign";
+        const errorMessage = getErrorMessage(err);
         setError(errorMessage);
         throw err;
       } finally {
@@ -97,73 +109,70 @@ export const useCampaigns = () => {
     []
   );
 
-  const deleteCampaign = useCallback(async (id: string): Promise<void> => {
-    setError(null);
-
-    try {
-      setCampaigns((prev) => prev.filter((campaign) => campaign.id !== id));
-
-      await campaignApiService.remove(id);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to delete campaign";
-      setError(errorMessage);
+  const deleteCampaignAction = useCallback(
+    async (id: number): Promise<void> => {
+      setError(null);
 
       try {
-        const apiCampaigns = await campaignApiService.getAll();
-        setCampaigns(apiCampaigns);
-      } catch (refetchErr) {
-        logger.error(
-          "Failed to restore campaigns after delete error",
-          refetchErr,
-          "useCampaigns"
-        );
+        setCampaigns((prev) => prev.filter((campaign) => campaign.id !== id));
+        await deleteCampaign(id);
+      } catch (err) {
+        const errorMessage = getErrorMessage(err);
+        setError(errorMessage);
+        try {
+          const apiCampaigns = await getCampaigns();
+          setCampaigns(apiCampaigns);
+        } catch (refetchErr) {
+          logger.error(
+            "Failed to restore campaigns after delete error",
+            refetchErr,
+            "useCampaigns"
+          );
+        }
+
+        throw err;
       }
+    },
+    []
+  );
 
-      throw err;
-    }
-  }, []);
-
-  const getCampaign = useCallback(async (id: string): Promise<Campaign> => {
+  const getCampaign = useCallback(async (id: number): Promise<Campaign> => {
     setError(null);
 
     try {
-      const campaign = await campaignApiService.getById(id);
+      const campaign = await getCampaignById(id);
       return campaign;
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to get campaign";
+      const errorMessage = getErrorMessage(err);
       setError(errorMessage);
       throw err;
     }
   }, []);
-
-  const saveCampaign = useCallback(
-    async (data: CampaignFormData, id?: string): Promise<Campaign> => {
-      return id ? updateCampaign(id, data) : createCampaign(data);
-    },
-    [createCampaign, updateCampaign]
-  );
 
   return {
     campaigns,
     isLoading,
     error,
     getCampaign,
-    createCampaign,
-    updateCampaign,
-    deleteCampaign,
-    saveCampaign,
+    createCampaign: createCampaignAction,
+    updateCampaign: updateCampaignAction,
+    deleteCampaign: deleteCampaignAction,
     refresh: useCallback(async () => {
       try {
         setIsLoading(true);
-        const apiCampaigns = await campaignApiService.getAll();
-        setCampaigns(apiCampaigns);
-        setError(null);
+        const apiCampaigns = await getCampaigns();
+
+        if (Array.isArray(apiCampaigns)) {
+          setCampaigns(apiCampaigns);
+          setError(null);
+        } else {
+          setCampaigns([]);
+          setError("Invalid response format from server");
+        }
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to refresh campaigns";
+        const errorMessage = getErrorMessage(err);
         setError(errorMessage);
+        setCampaigns([]);
       } finally {
         setIsLoading(false);
       }
@@ -191,7 +200,8 @@ export const useCampaignStatus = () => {
 
   const getStatusLabel = useCallback(
     (status: Campaign["status"]) => {
-      return t(`status.${status}`);
+      if (!status) return t("status.unknown");
+      return t(`status.${status.toLowerCase()}`);
     },
     [t]
   );

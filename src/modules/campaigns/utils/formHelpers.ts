@@ -1,20 +1,14 @@
-export const formatTimeForInput = (date?: Date): string => {
+export const formatDateForDisplay = (date: string | null): string => {
   if (!date) return "";
-  return date.toTimeString().slice(0, 5);
+  return new Date(date).toLocaleString();
 };
 
-export const parseTimeFromInput = (timeString: string): Date => {
-  const [hours, minutes] = timeString.split(":").map(Number);
-  const date = new Date();
-  date.setHours(hours, minutes, 0, 0);
-  return date;
+export const formatDateForInput = (date: string | null): string => {
+  if (!date) return "";
+  return new Date(date).toISOString();
 };
 
-export const isScheduledExecution = (executionType: string): boolean => {
-  return executionType === "programada";
-};
-
-export const validateTimeString = (timeString: string): boolean => {
-  const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
-  return timeRegex.test(timeString);
+export const validateDateString = (dateString: string): boolean => {
+  const date = new Date(dateString);
+  return !isNaN(date.getTime());
 };

@@ -66,29 +66,25 @@ export const RegisterPage: React.FC = () => {
 
       await registerUser(data.name, data.email, data.password);
 
-      setTimeout(() => {
-        toast.success(t("auth.register.success", { name: data.name }), 5000);
-      }, 100);
+      toast.success(`¡Bienvenido a Laraigo, ${data.name}!`, 2000);
 
       setTimeout(() => {
-        navigate("/dashboard");
-      }, 1000);
+        navigate("/campaigns", { replace: true });
+      }, 2000);
     } catch (err: any) {
-      let errorMessage = t("auth.register.error.general");
+      let errorMessage = "Error de registro. Inténtalo de nuevo.";
 
-      if (err.message?.includes("Email already registered")) {
-        errorMessage =
-          "Email already registered. Please use a different email.";
-      } else if (err.message?.includes("Invalid registration data")) {
-        errorMessage =
-          "Invalid registration data. Please check your information.";
+      if (err.message === "EMAIL_EXISTS") {
+        errorMessage = "Este email ya está registrado. Usa uno diferente.";
+      } else if (err.message === "INVALID_DATA") {
+        errorMessage = "Datos inválidos. Revisa tu información.";
       } else if (err.message === "SERVER_ERROR") {
-        errorMessage = "Server error. Please try again later.";
+        errorMessage = "Error del servidor. Intenta más tarde.";
       } else if (err.message === "NETWORK_ERROR") {
-        errorMessage = "Network error. Please check your connection.";
+        errorMessage = "Error de conexión. Intenta más tarde.";
       }
 
-      toast.error(errorMessage, 6000);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

@@ -63,6 +63,38 @@ export interface RefreshRequest {
   refreshToken: string;
 }
 
+const decodeJWT = (
+  token: string
+): { exp?: number; [key: string]: any } | null => {
+  try {
+    const payload = token.split(".")[1];
+    const decodedPayload = atob(payload);
+    return JSON.parse(decodedPayload);
+  } catch {
+    return null;
+  }
+};
+
+export const isExpired = (
+  token: string,
+  skewSeconds: number = 120
+): boolean => {
+  const decoded = decodeJWT(token);
+  if (!decoded?.exp) return true;
+  const now = Math.floor(Date.now() / 1000);
+  return decoded.exp <= now + skewSeconds;
+};
+
+export const shouldRefresh = (
+  token: string,
+  skewSeconds: number = 180
+): boolean => {
+  const decoded = decodeJWT(token);
+  if (!decoded?.exp) return true;
+  const now = Math.floor(Date.now() / 1000);
+  return decoded.exp <= now + skewSeconds;
+};
+
 export const TokenStorage = {
   setTokens: (
     accessToken: string,
@@ -82,6 +114,19 @@ export const TokenStorage = {
 
   getRefreshToken: (): string | null => {
     return localStorage.getItem("refreshToken");
+  },
+
+  isTokenExpired: (token: string): boolean => {
+    const decoded = decodeJWT(token);
+    if (!decoded?.exp) return true;
+    return Date.now() >= decoded.exp * 1000;
+  },
+
+  shouldRefreshToken: (token: string): boolean => {
+    const decoded = decodeJWT(token);
+    if (!decoded?.exp) return true;
+    const threeMinutesInMs = 3 * 60 * 1000;
+    return Date.now() >= decoded.exp * 1000 - threeMinutesInMs;
   },
 
   clearTokens: () => {
@@ -106,8 +151,6 @@ export class AuthService {
     try {
       const response = await apiClient.post("/auth/register", data);
 
-      console.log("🔍 Register response:", response.data);
-
       const backendResponse: BackendRegisterResponse = response.data;
 
       if (!backendResponse.accessToken) {
@@ -129,33 +172,23 @@ export class AuthService {
 
       return user;
     } catch (error: any) {
-      console.error("Register error:", error);
-
       if (error.response?.status === 400) {
-        throw new Error(
-          "Invalid registration data. Please check your information."
-        );
+        throw new Error("INVALID_DATA");
       } else if (error.response?.status === 409) {
-        throw new Error(
-          "Email already registered. Please use a different email."
-        );
+        throw new Error("EMAIL_EXISTS");
       } else if (error.response?.status >= 500) {
-        throw new Error("Server error. Please try again later.");
+        throw new Error("SERVER_ERROR");
       } else if (!error.response) {
-        throw new Error("Network error. Please check your connection.");
+        throw new Error("NETWORK_ERROR");
       }
 
-      throw new Error(
-        error instanceof Error ? error.message : "Registration failed"
-      );
+      throw new Error("REGISTRATION_FAILED");
     }
   }
 
   static async login(data: LoginRequest): Promise<User> {
     try {
       const response = await apiClient.post("/auth/login", data);
-
-      console.log("🔍 Login response:", response.data);
 
       const backendResponse: BackendLoginResponse = response.data;
 
@@ -178,8 +211,6 @@ export class AuthService {
 
       return user;
     } catch (error: any) {
-      console.error("Login error:", error);
-
       if (error.response?.status === 401 || error.response?.status === 400) {
         throw new Error("INVALID_CREDENTIALS");
       } else if (error.response?.status >= 500) {
@@ -188,7 +219,7 @@ export class AuthService {
         throw new Error("NETWORK_ERROR");
       }
 
-      throw new Error(error instanceof Error ? error.message : "Login failed");
+      throw new Error("LOGIN_FAILED");
     }
   }
 
@@ -204,7 +235,6 @@ export class AuthService {
 
     try {
       const response = await apiClient.post("/auth/refresh", { refreshToken });
-      console.log("🔍 Refresh response:", response.data);
 
       const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
         response.data;
@@ -217,17 +247,18 @@ export class AuthService {
       return { accessToken: newAccessToken, refreshToken: newRefreshToken };
     } catch (error) {
       TokenStorage.clearTokens();
-      throw new Error(
-        error instanceof Error ? error.message : "Token refresh failed"
-      );
+      throw new Error("SESSION_EXPIRED");
     }
   }
 
   static async logout(): Promise<void> {
     try {
-      await apiClient.post("/auth/logout");
+      const refreshToken = TokenStorage.getRefreshToken();
+      if (refreshToken) {
+        await apiClient.post("/auth/logout", { refreshToken });
+      }
     } catch (error) {
-      console.warn("Logout API call failed:", error);
+      // Silent logout on API failure
     } finally {
       TokenStorage.clearTokens();
     }
@@ -240,9 +271,12 @@ export class AuthService {
       throw new Error("No access token");
     }
 
+    if (TokenStorage.isTokenExpired(accessToken)) {
+      throw new Error("Token expired");
+    }
+
     try {
       const response = await apiClient.get("/auth/verify");
-      console.log("🔍 Verify response:", response.data);
 
       const { user: backendUser } = response.data;
 
@@ -261,14 +295,41 @@ export class AuthService {
       return user;
     } catch (error) {
       TokenStorage.clearTokens();
-      throw new Error(
-        error instanceof Error ? error.message : "Token verification failed"
-      );
+      throw new Error("TOKEN_VERIFICATION_FAILED");
+    }
+  }
+
+  static async getCurrentUserFromAPI(): Promise<User> {
+    try {
+      const response = await apiClient.get("/users/me");
+      const backendUser = response.data;
+
+      if (!backendUser) {
+        throw new Error("No user data");
+      }
+
+      const user: User = {
+        id: backendUser.id?.toString() || backendUser.id,
+        name: backendUser.name,
+        email: backendUser.email,
+        role: backendUser.role,
+      };
+
+      TokenStorage.setUser(user);
+      return user;
+    } catch (error) {
+      throw new Error("FAILED_TO_GET_USER");
     }
   }
 
   static isAuthenticated(): boolean {
-    return !!TokenStorage.getAccessToken();
+    const token = TokenStorage.getAccessToken();
+    return !!(token && !isExpired(token));
+  }
+
+  static shouldRefreshToken(): boolean {
+    const token = TokenStorage.getAccessToken();
+    return !!(token && shouldRefresh(token));
   }
 
   static getCurrentUser(): User | null {

@@ -60,26 +60,26 @@ export const LoginPage: React.FC = () => {
 
       setIsSuccess(true);
       const userName = data.email.split("@")[0];
-      toast.success(t("auth.login.success", { name: userName }), 4000);
+      toast.success(`¡Bienvenido de nuevo, ${userName}!`, 2000);
 
       setTimeout(() => {
-        navigate("/dashboard");
-      }, 800);
+        navigate("/campaigns", { replace: true });
+      }, 2000);
     } catch (err: any) {
       setHasError(true);
       setValue("password", "");
 
-      let errorMessage = "Invalid email or password. Please try again.";
+      let errorMessage = "Credenciales inválidas. Inténtalo de nuevo.";
 
       if (err.message === "INVALID_CREDENTIALS") {
-        errorMessage = t("auth.login.error.invalid");
+        errorMessage = "Credenciales inválidas. Inténtalo de nuevo.";
       } else if (err.message === "NETWORK_ERROR") {
-        errorMessage = t("auth.login.error.network");
+        errorMessage = "Error de conexión. Intenta más tarde.";
       } else if (err.message === "SERVER_ERROR") {
-        errorMessage = t("auth.login.error.server");
+        errorMessage = "Error del servidor. Intenta más tarde.";
       }
 
-      toast.error(errorMessage, 5000);
+      toast.error(errorMessage);
 
       setTimeout(() => setHasError(false), 500);
     } finally {

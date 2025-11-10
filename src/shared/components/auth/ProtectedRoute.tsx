@@ -1,8 +1,6 @@
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { Box, CircularProgress, Typography } from "@mui/material";
 import { useAuth } from "@app/providers/AuthProvider";
-import { colors } from "@shared/styles/colors";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -13,37 +11,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   requireAuth = true,
 }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isReady } = useAuth();
   const location = useLocation();
 
-  if (isLoading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "100vh",
-          background: colors.gradient.primary,
-          color: "white",
-        }}
-      >
-        <CircularProgress
-          sx={{
-            color: "white",
-            mb: 2,
-          }}
-          size={48}
-        />
-        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          Cargando...
-        </Typography>
-        <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
-          Verificando sesión
-        </Typography>
-      </Box>
-    );
+  if (!isReady) {
+    return null;
   }
 
   if (requireAuth && !isAuthenticated) {
@@ -51,7 +23,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (!requireAuth && isAuthenticated) {
-    const from = location.state?.from?.pathname || "/dashboard";
+    const from = location.state?.from?.pathname || "/campaigns";
     return <Navigate to={from} replace />;
   }
 

@@ -14,14 +14,15 @@ import { useTranslation } from "@app/providers/I18nProvider";
 import { campaignSchema, CampaignFormData } from "../schemas/campaignSchema";
 import { getDefaultCampaignValues } from "../utils/formDefaults";
 import { useToast } from "@shared/components/ui";
-import { bootstrapService, BootstrapData } from "../services/bootstrapService";
 import { logger } from "@shared/utils/logger";
+import { getCampaignById } from "../data/campaignApiService";
+import { bootstrapService, BootstrapData } from "../services/bootstrapService";
 
 interface CampaignContextType extends UseFormReturn<CampaignFormData> {
   updateField: (field: keyof CampaignFormData, value: any) => void;
   isLoadingCampaign: boolean;
   isReady: boolean;
-  bootstrapData: BootstrapData | null;
+  bootstrapData: BootstrapData;
 }
 
 const CampaignContext = createContext<CampaignContextType | null>(null);
@@ -39,12 +40,32 @@ export const CampaignProvider: React.FC<CampaignProviderProps> = ({
   const { id } = useParams<{ id: string }>();
   const [isLoadingCampaign, setIsLoadingCampaign] = useState(false);
   const [isReady, setIsReady] = useState(false);
-  const [bootstrapData, setBootstrapData] = useState<BootstrapData | null>(
-    null
-  );
+  const [bootstrapData, setBootstrapData] = useState<BootstrapData>({
+    sources: [],
+    executionTypes: [],
+    groups: [],
+    channels: [],
+    messageTypes: [],
+    templates: {},
+  });
   const toast = useToast();
 
-  const resolver = useMemo(() => zodResolver(campaignSchema(t)), [t]);
+  const isEditing = id && id !== "new";
+  const resolver = useMemo(() => zodResolver(campaignSchema), []);
+
+  useEffect(() => {
+    const loadBootstrapData = async () => {
+      try {
+        const data = await bootstrapService.getBootstrap();
+        setBootstrapData(data);
+      } catch (error) {
+        logger.error("Failed to load bootstrap data", error, "CampaignContext");
+        toast.error(t("errors.bootstrap_load_failed"));
+      }
+    };
+
+    loadBootstrapData();
+  }, [t, toast]);
 
   const defaultValues = useMemo(
     () => ({
@@ -57,51 +78,54 @@ export const CampaignProvider: React.FC<CampaignProviderProps> = ({
   const methods = useForm<CampaignFormData>({
     resolver,
     defaultValues,
-    mode: "all",
+    mode: "onChange",
+    criteriaMode: "all",
     reValidateMode: "onChange",
   });
 
   const { setValue, reset } = methods;
 
   useEffect(() => {
-    const loadBootstrapData = async () => {
+    const loadCampaign = async () => {
+      if (!isEditing) {
+        setIsReady(true);
+        return;
+      }
+
       try {
         setIsLoadingCampaign(true);
         setIsReady(false);
 
-        const campaignId = id && id !== "new" ? id : undefined;
-        const data = await bootstrapService.getBootstrap(campaignId);
+        const campaign = await getCampaignById(Number(id));
 
-        setBootstrapData(data);
-
-        if (data.campaign) {
-          reset({
-            title: data.campaign.title,
-            description: data.campaign.description,
-            startDate: data.campaign.startDate,
-            endDate: data.campaign.endDate,
-            source: data.campaign.source,
-            executionType: data.campaign.executionType,
-            scheduledDate: data.campaign.scheduledDate,
-            scheduledTime: data.campaign.scheduledTime,
-            group: data.campaign.group,
-            channel: data.campaign.channel,
-            messageType: data.campaign.messageType,
-            template: data.campaign.template,
-          });
-        }
+        reset({
+          title: campaign.title,
+          description: campaign.description,
+          startDate: campaign.startDate,
+          endDate: campaign.endDate,
+          source: campaign.source,
+          executionType: campaign.executionType,
+          scheduledDate: campaign.scheduledDate,
+          scheduledTime: campaign.scheduledTime,
+          group: campaign.group,
+          channel: campaign.channel,
+          messageType: campaign.messageType,
+          template: campaign.template,
+          persons: campaign.persons,
+          filePath: campaign.filePath,
+        });
 
         setIsReady(true);
       } catch (error) {
-        logger.error("Failed to load bootstrap data", error, "CampaignContext");
+        logger.error("Failed to load campaign", error, "CampaignContext");
         toast.error(t("errors.campaign_load_failed"));
       } finally {
         setIsLoadingCampaign(false);
       }
     };
 
-    loadBootstrapData();
-  }, [id, reset, t, toast]);
+    loadCampaign();
+  }, [id, isEditing, reset, t, toast]);
 
   const updateField = useCallback(
     (field: keyof CampaignFormData, value: any) => {

@@ -3,16 +3,18 @@ import { CampaignFormData } from "../schemas/campaignSchema";
 export const defaultCampaignValues: CampaignFormData = {
   title: "",
   description: "",
-  startDate: null,
+  startDate: "",
   endDate: null,
   source: "",
   executionType: "",
   scheduledDate: null,
-  scheduledTime: "",
+  scheduledTime: null,
   group: "",
   channel: "",
   messageType: "",
   template: "",
+  persons: [],
+  filePath: null,
 };
 
 export const getDefaultCampaignValues = (): CampaignFormData => {
