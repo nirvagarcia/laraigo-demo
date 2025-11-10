@@ -1,4 +1,15 @@
 {
+  "users": [
+    {
+      "id": "1",
+      "name": "Demo User",
+      "email": "demo@laraigo.com",
+      "password": "Demo123456",
+      "role": "USER",
+      "createdAt": "2025-11-09T10:00:00.000Z",
+      "lastLoginAt": "2025-11-09T10:00:00.000Z"
+    }
+  ],
   "campaigns": [
     {
       "id": "1",

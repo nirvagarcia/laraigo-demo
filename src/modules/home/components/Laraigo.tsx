@@ -6,15 +6,21 @@ import { HeroChip } from "@shared/components/ui/HeroChip";
 import { GradientButton } from "@shared/components/ui/GradientButton";
 import { FeatureGrid } from "@shared/components/ui/FeatureGrid";
 import { useTranslation } from "@app/providers/I18nProvider";
+import { useAuth } from "@app/providers/AuthProvider";
 import { layouts } from "@shared/styles/layouts";
 import { laraigoSx } from "../styles/laraigo-styles";
 
 export const Laraigo: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
 
   const handleGoToCampaigns = () => {
-    navigate("/campaigns");
+    if (isAuthenticated) {
+      navigate("/campaigns");
+    } else {
+      navigate("/login");
+    }
   };
 
   const featureChips = [

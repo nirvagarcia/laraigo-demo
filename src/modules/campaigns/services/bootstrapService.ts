@@ -1,7 +1,9 @@
-import { API_BASE_URL } from "@app/config/api";
+import { API_CONFIG } from "@app/config/api";
 import { Campaign } from "../types/campaign";
 import { SelectOption } from "../types/selectOption";
 import { logger } from "@shared/utils/logger";
+
+const API_BASE_URL = API_CONFIG.BASE_URL;
 
 export interface BootstrapData {
   sources: SelectOption[];

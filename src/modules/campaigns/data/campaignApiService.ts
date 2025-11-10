@@ -1,5 +1,7 @@
-import { API_BASE_URL } from "@app/config/api";
+import { API_CONFIG } from "@app/config/api";
 import { Campaign } from "../types/campaign";
+
+const API_BASE_URL = API_CONFIG.BASE_URL;
 
 const parseDates = (campaign: any): Campaign => ({
   ...campaign,

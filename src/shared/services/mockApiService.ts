@@ -1,4 +1,6 @@
-import { API_BASE_URL } from "@app/config/api";
+import { API_CONFIG } from "@app/config/api";
+
+const API_BASE_URL = API_CONFIG.BASE_URL;
 
 export const mockApiService = {
   async get<T>(endpoint: string): Promise<T> {

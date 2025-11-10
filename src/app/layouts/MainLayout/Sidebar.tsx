@@ -1,8 +1,11 @@
-import { useTheme } from "@mui/material";
+import { useTheme, Avatar, IconButton, Tooltip } from "@mui/material";
+import { LogoutOutlined } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AppBox } from "@shared/components/ui/AppBox";
 import { AppText } from "@shared/components/ui/AppText";
+import { useToast } from "@shared/components/ui";
 import { useTranslation } from "@app/providers/I18nProvider";
+import { useAuth } from "@app/providers/AuthProvider";
 import { colors } from "@shared/styles/colors";
 
 interface NavItem {
@@ -15,6 +18,8 @@ export const Sidebar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user, logout } = useAuth();
+  const toast = useToast();
   const theme = useTheme();
 
   const navItems: NavItem[] = [
@@ -42,6 +47,27 @@ export const Sidebar: React.FC = () => {
 
   const handleNavigation = (path: string) => {
     navigate(path);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success(t("auth.logout.success"), 4000);
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error(t("auth.logout.error"), 5000);
+      navigate("/login");
+    }
+  };
+
+  const getUserInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   return (
@@ -144,6 +170,80 @@ export const Sidebar: React.FC = () => {
           })}
         </AppBox>
       </AppBox>
+
+      {/* User Section with Logout */}
+      {user && (
+        <AppBox
+          direction="column"
+          p={3}
+          sx={{
+            borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+          }}
+        >
+          <AppBox
+            direction="row"
+            align="center"
+            gap={2}
+            sx={{
+              mb: 2,
+              p: 2,
+              borderRadius: 2,
+              background: "rgba(255, 255, 255, 0.1)",
+            }}
+          >
+            <Avatar
+              sx={{
+                width: 40,
+                height: 40,
+                bgcolor: "rgba(255, 255, 255, 0.2)",
+                color: "white",
+                fontSize: "0.875rem",
+                fontWeight: 600,
+              }}
+            >
+              {getUserInitials(user.name)}
+            </Avatar>
+            <AppBox direction="column" flex={1}>
+              <AppText
+                variant="body2"
+                weight="semibold"
+                sx={{ color: "white" }}
+              >
+                {user.name}
+              </AppText>
+              <AppText
+                variant="caption"
+                sx={{
+                  color: "rgba(255, 255, 255, 0.7)",
+                  fontSize: "0.75rem",
+                }}
+              >
+                {user.email}
+              </AppText>
+            </AppBox>
+          </AppBox>
+
+          <Tooltip title="Cerrar Sesión" placement="top">
+            <IconButton
+              onClick={handleLogout}
+              sx={{
+                color: "rgba(255, 255, 255, 0.8)",
+                background: "rgba(255, 255, 255, 0.1)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                borderRadius: 2,
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  background: "rgba(255, 255, 255, 0.2)",
+                  color: "white",
+                  transform: "translateY(-1px)",
+                },
+              }}
+            >
+              <LogoutOutlined fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </AppBox>
+      )}
 
       <AppBox
         direction="column"

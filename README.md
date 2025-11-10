@@ -52,3 +52,5 @@ cd laraigo-demo
 # 3️⃣ Install & Launch 🚀
 npm install && npm run dev
 ```
+
+npm run json-server
